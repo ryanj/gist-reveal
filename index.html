@@ -152,10 +152,10 @@ git commit -m 'adding my own deck of Revealjs slides'</code></pre>
   rhc app restart revealjs
 Then, configure your browser as a presentation device by loading the following URL: 
   http://revealjs-ryanj.rhcloud.com/?setToken=13970277424997223296</code></pre><br/>
-              <p class='fragment'>Use <code contenteditable>rhc tail revealjs</code> to fetch a fresh random secret key for your application, or make up your own keyphrase -<br/>just be sure to use the same value on the server and in your presentation device.</p>
+              <p><span class='fragment'>Use <code contenteditable>rhc tail revealjs</code> to fetch a fresh random secret key for your deck, or make up your own secret keyphrase - </span><br/><span class='fragment'>just be sure to use the same value on the server as you do in your presentation device.</span></p>
   				</section>
   				<section>
-            <p><span clas='fragment'>After following the instructions in your server log,</span><br/> <span class='fragment'>and saving your secret key using <code>rhc env set</code>,</span><br/><span class='fragment'>your slide transitions will automatically be relayed out to any connected browsers!</span></p>
+            <p><span clas='fragment'>After following the instructions in the log,</span><br/><span class='fragment'>any slide transitions that take place on your presentation device will automatically be relayed out to any web browsers that are currently viewing your OpenShift-hosted slide deck!</span></p>
   				</section>
   				<section>
             <p>Be sure to use two different devices or brower types when testing your broadcasting relay<br/> <span class='fragment'>(FireFox vs. Chrome, desktop vs. mobile, etc.)</span></p> <br/> 

@@ -42,7 +42,7 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section data-background-transition='zoom' data-transition='linear' data-background='http://ryanjarvinen.com/presentations/shared/img/broadcast_reveal_dark.png' data-state='blackout'>
+				<section data-background-transition='zoom' data-transition='concave' data-background='http://ryanjarvinen.com/presentations/shared/img/broadcast_reveal_dark.png' data-state='blackout'>
 					<h2>Broadcasting Your</h3>
 					<h1>Reveal.js</h1>
 					<h2>Slideshow Presentations</h2>
@@ -66,15 +66,15 @@
   					</aside>
   				</section>
 
-					<section>
+					<section data-transition='concave'>
             <h3>pre-requisites</h3>
             <p>
               In order to deploy and update your slideshow content on OpenShift you'll need to have:<ol><li class='fragment'><code>git</code></li><li class='fragment'><code>RubyGems</code></li><li class='fragment'>and the <a href="https://openshift.redhat.com/app/login?then=%2Fapp%2Fconsole%2Fapplication_type%2Fcart%21nodejs-0.10%3Fname%3Drevealjs%26initial_git_url%3Dhttps%253A%252F%252Fgithub.com%2Fryanj%2Freveal.js.git"><code>rhc</code></a> command-line tool</li></ol><p><span class='fragment'> installed and available</span><br/> <span class='fragment'> in your development environment</span></p>
 					  </p>
 					</section>
   		  </section>
-  		  <section>
-					<section>
+  		  <section data-transition='concave'>
+					<section data-transition='concave'>
 						<h2>Creating a New Deck</h2>
 						<p class='fragment'>
 							A fresh slide deck can be created using OpenShift's <code>rhc</code> commad-line tool, or through the OpenShift web console.  
@@ -86,7 +86,7 @@
               <li class='fragment'>command line</li>
             </ol>
 					</section>
-					<section>
+					<section data-transition='linear'>
 						<h2>Click to Launch</h2>
 						<p>You can <a href='https://openshift.redhat.com/app/console/application_type/cart!nodejs-0.10?name=revealjs&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/reveal.js.git'>fire up your own copy of this presentation right from your browser</a> using OpenShift's <a href='https://www.openshift.com/blogs/launching-applications-with-openshifts-web-based-workflow'>app launch workflow</a></p>
             <br/><br/><h1 class='fragment'><a href='https://openshift.redhat.com/app/console/application_type/cart!nodejs-0.10?name=revealjs&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/reveal.js.git'>&lt;Launch Slides&gt;</a></h1>
@@ -96,7 +96,7 @@
 						<p class='fragment'>Use the <code>--from-code</code> option to specify your initial git source when launching your app.</p><br/><p class='fragment'>The following command will spin up a fresh nodejs server along with the included project source, allowing you create your own slide deck in a single command:</p>
             <br/><pre class='fragment'><code contenteditable>rhc app create revealjs nodejs-0.10 --from-code=http://github.com/ryanj/reveal.js.git</code></pre>
 					</section>
-					<section>
+					<section data-transition='concave'>
 						<h2>Live on the web in Seconds</h2>
             <br/>
 						<p class='fragment'><b><i>That's it!</i></b></p><br/><p class='fragment'>Your new Reveal.js deck should now be available via the URL printed in the previous command's output.</p>
@@ -131,21 +131,21 @@ grunt serve</code></pre>
             <pre class='fragment'><code contenteditable>git add index.html
 git commit -m 'adding my own deck of Revealjs slides'</code></pre>
   				</section>
-  				<section>
+  				<section data-transition='linear'>
   					<h3>Pushing to OpenShift</h3>
             <p class='fragment'>Then, deploy your changes to the cloud with: 
             </p>
             <pre class='fragment'><code contenteditable>git push</code></pre>
   				</section>
 				</section>
-				<section>
+				<section data-transition='concave'>
   				<section>
-  					<h2>Broadcasting Your Slide Transitions</h2><h1 class='fragment'>with Socket.IO</h1>
+  					<h2>Broadcasting Your Slide Transitions</h2><h1 class='fragment grow'>with Socket.IO</h1>
   					<pi class='fragment'>Now that your custom slide content is available on the web, check your server logs for follow-up info on how to configure your presentation device:
   					</p>
               <pre class='fragment'><code contenteditable>rhc tail revealjs</code></pre>
   				</section>
-  				<section>
+  				<section data-transition='concave'>
             <p>The Hosted plugin for Reveal.js will automatically generate a new random secret key,<br/><span class='fragment'>and print sample configuration information to the log:</span></p><br/>
               <pre class='fragment'><code contenteditable>Tell OpenShift to save this broadcast token and publish it as an environment variable:
   rhc env set REVEAL_SOCKET_SECRET=13970277424997223296 -a revealjs
@@ -154,13 +154,12 @@ Then, configure your browser as a presentation device by loading the following U
   http://revealjs-ryanj.rhcloud.com/?setToken=13970277424997223296</code></pre><br/>
               <p><span class='fragment'>Use <code contenteditable>rhc tail revealjs</code> to fetch a fresh random secret key for your deck, or make up your own secret keyphrase - </span><br/><span class='fragment'>just be sure to use the same value on the server as you do in your presentation device.</span></p>
   				</section>
-  				<section>
+  				<section data-transition='concave'>
             <p><span clas='fragment'>After following the instructions in the log,</span><br/><span class='fragment'>any slide transitions that take place on your presentation device will automatically be relayed out to any web browsers that are currently viewing your OpenShift-hosted slide deck!</span></p>
   				</section>
-  				<section>
+  				<section data-transition='zoom' data-background-transition='zoom'>
             <p>Be sure to use two different devices or brower types when testing your broadcasting relay<br/> <span class='fragment'>(FireFox vs. Chrome, desktop vs. mobile, etc.)</span></p> <br/> 
             <p><span class='fragment'>Additional details on using the <code>hosted</code> plugin for Reveal.js<br/> are available in this post:</span><br/> <br/><span class='fragment'><a href='https://www.openshift.com/blogs/broadcast-your-slideshow-presentations-with-socketio-and-revealjs'>Broadcasting your slideshow presentations<br/> with Socket.io and Reveal.js</a></span></p> 
-
   				</section>
 				</section>
 

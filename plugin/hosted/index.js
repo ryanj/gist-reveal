@@ -8,6 +8,7 @@ var io			= io.listen(app);
 var request = require('request');
 var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
+var ga_tracker_key = process.env.GA_TRACKER || 'UA-20043816-1';
 
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
@@ -25,24 +26,27 @@ var createHash = function(secret) {
 };
 
 app.configure(function() {
-	[ 'css', 'js', 'plugin', 'lib' ].forEach(function(dir) {
+	[ 'css', 'js', 'plugin', 'lib', 'img' ].forEach(function(dir) {
 		app.use('/' + dir, staticDir(opts.baseDir + dir));
 	});
 });
 
 var render_slideshow = function(gist) {
   for(var i in gist.files){
-    var title = i;
-    var slides = gist.files[i].content;
-    var description = gist.description;
-    var user = gist.owner.login;
-    break;
+    if( gist.files[i].type == "text/html"){
+      var title = i;
+      var slides = gist.files[i].content;
+      var description = gist.description;
+      var user = gist.owner.login;
+      break;
+    }
   }
   return slideshow_template.toString()
-                           .replace(/\{\{slides\}\}/, slides)
+                           .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)
                            .replace(/\{\{user}}/, user)
+                           .replace(/'UA-20043816-1'/, '"'+ga_tracker_key+'"')
                            .replace(/\{\{description}}/, description);
 };
 

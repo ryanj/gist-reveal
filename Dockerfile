@@ -5,7 +5,7 @@ RUN yum install -y npm
 RUN yum install -y git
 RUN yum install -y bzip2
 
-ADD . /app
+RUN git clone https://github.com/ryanj/gist-reveal.it.git /app
 
 WORKDIR /app
 
@@ -13,4 +13,4 @@ RUN npm install
 
 EXPOSE 8080
 
-CMD npm start
+CMD OPENSHIFT_NODEJS_IP=0.0.0.0 npm start

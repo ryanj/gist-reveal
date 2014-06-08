@@ -5,15 +5,19 @@ var crypto		= require('crypto');
 var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
+var request = require('request');
+var default_slides = require('./default_response.json');
+var error_slides = require('./error_response.json');
 
 var opts = {
-	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 1948,
+	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
   ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-  web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:1948',
+  web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080',
   socket_host: process.env.REVEAL_SOCKET_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
 	baseDir : __dirname + '/../../'
 };
+var slideshow_template = fs.readFileSync(opts.baseDir + '/index.html');
 
 var createHash = function(secret) {
 	var cipher = crypto.createCipher('blowfish', secret);
@@ -26,11 +30,44 @@ app.configure(function() {
 	});
 });
 
-app.get("/", function(req, res) {
-  var data = fs.readFileSync(opts.baseDir + '/index.html');
-  response = data.toString().replace(/hosted: {}/, getClientConfig());
-  res.send(response, 200, {'Content-Type': 'text/html'});
-});
+var render_slideshow = function(gist) {
+  for(var i in gist.files){
+    var title = i;
+    var slides = gist.files[i].content;
+    var description = gist.description;
+    var user = gist.owner.login;
+    break;
+  }
+  return slideshow_template.toString()
+                           .replace(/\{\{slides\}\}/, slides)
+                           .replace(/hosted: {}/, getClientConfig())
+                           .replace(/\{\{title}}/, title)
+                           .replace(/\{\{user}}/, user)
+                           .replace(/\{\{description}}/, description);
+};
+
+var get_slides = function(req, res, next) {
+  if(typeof(req.params.gist_id) !== "undefined"){
+    var gist_api_url = "https://api.github.com/gists/";
+    var gist_id = req.params.gist_id;
+    request({
+      url: gist_api_url + gist_id, 
+      headers: {'User-Agent': 'request'}
+    },function (error, response, api_response) {
+      if (!error && response.statusCode == 200) {
+        gist = JSON.parse(api_response);
+      }else{
+        gist = error_slides;
+      }
+      return res.send(render_slideshow(gist), 200, {'Content-Type': 'text/html'});
+    });
+  }else{
+    return res.send(render_slideshow(default_slides), 200, {'Content-Type': 'text/html'});
+  }
+};
+
+app.get("/", get_slides);
+app.get("/:gist_id", get_slides);
 
 app.get("/token", function(req,res) {
   res.send('Information about setting up your presentation environment is available in the server logs');

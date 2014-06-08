@@ -1,8 +1,22 @@
-# reveal.js [![Build Status](https://travis-ci.org/hakimel/reveal.js.png?branch=master)](https://travis-ci.org/hakimel/reveal.js)
+# Gist-Reveal.it
 
-A framework for easily creating beautiful presentations using HTML. [Check out the live demo](http://lab.hakim.se/reveal-js/).
+A framework for easily creating beautiful slideshow presentations using gist, HTML or Markdown. [Check out the live demo](http://dockercon-slides.com/).
 
-reveal.js comes with a broad range of features including [nested slides](https://github.com/hakimel/reveal.js#markup), [markdown contents](https://github.com/hakimel/reveal.js#markdown), [PDF export](https://github.com/hakimel/reveal.js#pdf-export), [speaker notes](https://github.com/hakimel/reveal.js#speaker-notes) and a [JavaScript API](https://github.com/hakimel/reveal.js#api). It's best viewed in a browser with support for CSS 3D transforms but [fallbacks](https://github.com/hakimel/reveal.js/wiki/Browser-Support) are available to make sure your presentation can still be viewed elsewhere.
+## Run it on Docker!
+
+If you have [Docker](http://docker.com) available, you can run this image on port 80 with:
+
+    docker run -d -p 80:8080 ryanj/gist-reveal.it
+
+To use your own `GA-TRACKER` key, try:
+
+    docker run -e "GA_TRACKER=GA-12345678" ryanj/gist-reveal.it
+
+Or, to broadcast your presentations using a websocket rely, run:
+
+    docker run -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" ryanj/gist-reveal.it
+
+Reveal.js comes with a broad range of features including [nested slides](https://github.com/hakimel/reveal.js#markup), [markdown contents](https://github.com/hakimel/reveal.js#markdown), [PDF export](https://github.com/hakimel/reveal.js#pdf-export), [speaker notes](https://github.com/hakimel/reveal.js#speaker-notes) and a [JavaScript API](https://github.com/hakimel/reveal.js#api). It's best viewed in a browser with support for CSS 3D transforms but [fallbacks](https://github.com/hakimel/reveal.js/wiki/Browser-Support) are available to make sure your presentation can still be viewed elsewhere.
 
 
 #### More reading:
@@ -780,70 +794,6 @@ Reveal.initialize({
 	]
 });
 ```
-
-## Hosted
-This plugin includes support for [running Reveal.js slides on any deployment of](http://slide-shifter.rhcloud.com) the [OpenShift platform](http://openshift.com), and includes automatic support for multiplexing with SocketIO.
-
-### Create a fresh deck
-Create a new **hosted** slide deck using a [free OpenShift Online account](https://www.openshift.com/app/account/new), and the [`rhc` command-line tool](https://www.openshift.com/developers/rhc-client-tools-install):
-
-```bash
-rhc app create revealjs nodejs-0.10 --from-code=http://github.com/ryanj/reveal.js.git
-```
-
-The command output will include a web URL where your new OpenShift-compatible Reveal.js slide deck will be available:
-
-```
-slide @ http://slide-shifter.rhcloud.com/ (uuid: 531ea4b64382ec905800015c)
---------------------------------------------------------------------------
-  Domain:     shifter
-  Created:    Mar 10 10:52 PM
-  Gears:      1 (defaults to small)
-  Git URL:    ssh://531ea4b64382ec905800015c@slide-shifter.rhcloud.com/~/git/slides.git/
-  SSH:        531ea4b64382ec905800015c@slide-shifter.rhcloud.com
-```
-
-The `rhc app-create` command also generates a local copy of your application source for development purposes.  This can be disabled by passing the `--no-git` flag.
-
-The `hosted` plugin also offers support for [launching copies of Reveal.js right from the web](https://openshift.redhat.com/app/console/application_type/cart!nodejs-0.10?name=revealjs&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/reveal.js.git). 
-
-### Add your own deck
-
-Try making changes to your local `index.html` file, and then run `npm install` followed by `grunt serve` for a local development server.
-
-When you're ready to deploy your content, use git to `add` and `commit` your changes:
-```bash
-git add index.html
-git commit -m 'adding my own deck of slides'
-```
-Then, deploy your changes to OpenShift with `git push`:
-```bash
-git push
-```
-The application's build and deployment progress will be shown in the output from the git remote.
-
-### Broadcast your changes
-After your app's initial setup process is complete, you'll be able to tail your logs using the `rhc tail` command:
-```bash
-rhc tail revealjs
-```
-
-The server has been configured to generate usage information that includes randomized secret keys that can be easily copy/pasted.  
-
-From my Reveal.js application logs:
-```
-Tell OpenShift to save this broadcast token and publish it as an environment variable:
-  rhc env set REVEAL_SOCKET_SECRET=13970277424997223296 -a revealjs
-  rhc app restart revealjs
-Then, configure your browser as a presentation device by loading the following URL: 
-  http://revealjs-ryanj.rhcloud.com/?setToken=13970277424997223296
-```
-
-This information will be regenerated whenever the slides are reloaded.  You'll need to set your application's `REVEAL_SOCKET_SECRET`, and click on the supplied link in order to configure a browser for *presentation mode*.
-
-After storing your presentation key in your browser, and persisting the same secret key in your Reveal+SocketIO server, your slide transitions will automatically be broadcast out to any other connected browsers.
-
-Be sure to use two different brower types when testing this feature (FireFox and Chrome, etc.).
 
 ## Leap Motion
 The Leap Motion plugin lets you utilize your [Leap Motion](https://www.leapmotion.com/) device to control basic navigation of your presentation. The gestures currently supported are:

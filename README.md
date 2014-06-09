@@ -14,7 +14,7 @@ To use your own `GA-TRACKER` key, try:
 
 Or, to broadcast your presentations using a websocket rely, run:
 
-    docker run -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" ryanj/gist-reveal.it
+    docker run -e "REVEAL_WEB_HOST=YOUR_HOSTNAME_HERE" -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" ryanj/gist-reveal.it
 
 Reveal.js comes with a broad range of features including [nested slides](https://github.com/hakimel/reveal.js#markup), [markdown contents](https://github.com/hakimel/reveal.js#markdown), [PDF export](https://github.com/hakimel/reveal.js#pdf-export), [speaker notes](https://github.com/hakimel/reveal.js#speaker-notes) and a [JavaScript API](https://github.com/hakimel/reveal.js#api). It's best viewed in a browser with support for CSS 3D transforms but [fallbacks](https://github.com/hakimel/reveal.js/wiki/Browser-Support) are available to make sure your presentation can still be viewed elsewhere.
 

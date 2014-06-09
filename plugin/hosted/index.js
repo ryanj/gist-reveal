@@ -6,9 +6,11 @@ var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
 var request = require('request');
-var default_slides = require('./default_response.json');
+var default_gist_id = process.env.DEFAULT_GIST || '7ebf56442930b4c2188b';
 var error_slides = require('./error_response.json');
 var ga_tracker_key = process.env.GA_TRACKER || 'UA-20043816-1';
+
+var default_slides = require('./default_response.json');
 
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
@@ -51,23 +53,19 @@ var render_slideshow = function(gist) {
 };
 
 var get_slides = function(req, res, next) {
-  if(typeof(req.params.gist_id) !== "undefined"){
-    var gist_api_url = "https://api.github.com/gists/";
-    var gist_id = req.params.gist_id;
-    request({
-      url: gist_api_url + gist_id, 
-      headers: {'User-Agent': 'request'}
-    },function (error, response, api_response) {
-      if (!error && response.statusCode == 200) {
-        gist = JSON.parse(api_response);
-      }else{
-        gist = error_slides;
-      }
-      return res.send(render_slideshow(gist), 200, {'Content-Type': 'text/html'});
-    });
-  }else{
-    return res.send(render_slideshow(default_slides), 200, {'Content-Type': 'text/html'});
-  }
+  var gist_api_url = "https://api.github.com/gists/";
+  var gist_id = req.params.gist_id || default_gist_id;
+  request({
+    url: gist_api_url + gist_id, 
+    headers: {'User-Agent': 'request'}
+  },function (error, response, api_response) {
+    if (!error && response.statusCode == 200) {
+      gist = JSON.parse(api_response);
+    }else{
+      gist = error_slides;
+    }
+    return res.send(render_slideshow(gist), 200, {'Content-Type': 'text/html'});
+  });
 };
 
 app.get("/", get_slides);

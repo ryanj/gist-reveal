@@ -1,8 +1,8 @@
 {
   "files": {
-    "error-page": {
+    "rate-limit-error": {
       "type": "text/html",
-      "content": "    <section><p>Sorry, something went wrong and I wasn't able to convert this Gist ID into a slide deck.</p><br /><p><a href=\"http://gist-reveal.it/\">Learn how to use gist-reveal.it to host and share your own open source slides!</a></p></section>"
+      "content": "    <section><p>We've hit our limit!<br />Our application's GitHub API rate limit has been reached.</p><br /><p><a href=\"http://gist-reveal.it/\">Come back, and try again soon!</p></section>"
     }
   },
   "description": "gist-reveal.it - open source slides powered by gist.github.com and Reveal.js",

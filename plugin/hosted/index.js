@@ -6,11 +6,15 @@ var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
 var request = require('request');
-var default_gist_id = process.env.DEFAULT_GIST || '7ebf56442930b4c2188b';
-var error_slides = require('./error_response.json');
+var default_gist_id = process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd';
 var ga_tracker_key = process.env.GA_TRACKER || 'UA-20043816-1';
+// works without auth 
+var gh_client_secret = process.env.GH_CLIENT_SECRET;
+var gh_client_id = process.env.GH_CLIENT_ID;
 
+var rate_limit_slides = require('./rate_limit_response.json');
 var default_slides = require('./default_response.json');
+var error_slides = require('./error_response.json');
 
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
@@ -55,12 +59,20 @@ var render_slideshow = function(gist) {
 var get_slides = function(req, res, next) {
   var gist_api_url = "https://api.github.com/gists/";
   var gist_id = req.params.gist_id || default_gist_id;
+  // hits rate limits quickly when auth is omitted
+  var authentication = ""; 
+  if( typeof(gh_client_secret) !== "undefined" && 
+      typeof(gh_client_id)     !== "undefined" ){
+    authentication = "?client_id="+gh_client_id+"&client_secret="+gh_client_secret;
+  }
   request({
-    url: gist_api_url + gist_id, 
+    url: gist_api_url + gist_id + authentication, 
     headers: {'User-Agent': 'request'}
   },function (error, response, api_response) {
     if (!error && response.statusCode == 200) {
       gist = JSON.parse(api_response);
+    }else if (response.statusCode == 403){
+      gist = rate_limit_slides;
     }else{
       gist = error_slides;
     }

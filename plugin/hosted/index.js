@@ -6,24 +6,21 @@ var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
 var request = require('request');
-var default_gist_id = process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd';
-var ga_tracker_key = process.env.GA_TRACKER || 'UA-20043816-1';
-// works without auth 
-var gh_client_secret = process.env.GH_CLIENT_SECRET;
-var gh_client_id = process.env.GH_CLIENT_ID;
-
-var rate_limit_slides = require('./rate_limit_response.json');
-var default_slides = require('./default_response.json');
-var error_slides = require('./error_response.json');
-
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
   ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
   web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080',
   socket_host: process.env.REVEAL_SOCKET_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
+  default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
+  ga_tracker_key : process.env.GA_TRACKER,
+  gh_client_secret : process.env.GH_CLIENT_SECRET,
+  gh_client_id : process.env.GH_CLIENT_ID,
 	baseDir : __dirname + '/../../'
 };
+var rate_limit_slides = require('./rate_limit_response.json');
+var default_slides = require('./default_response.json');
+var error_slides = require('./error_response.json');
 var slideshow_template = fs.readFileSync(opts.baseDir + '/index.html');
 
 var createHash = function(secret) {
@@ -36,6 +33,19 @@ app.configure(function() {
 		app.use('/' + dir, staticDir(opts.baseDir + dir));
 	});
 });
+
+var ga_tracker_html = function(tracker_id, hostname){
+  if(typeof(tracker_id) !== 'undefined'){
+    return "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" + 
+    "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o)\n" + 
+    "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,\n" + 
+    "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n" + 
+    "ga('create', '"+tracker_id+"', '"+hostname+"');\n" + 
+    "ga('send', 'pageview');</script>";
+  }else{
+    return "";
+  }
+};
 
 var render_slideshow = function(gist) {
   for(var i in gist.files){
@@ -51,19 +61,20 @@ var render_slideshow = function(gist) {
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)
+                           .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(opts.ga_tracker_key, opts.web_host))
+                           .replace(/\{\{hostname}}/, opts.web_host)
                            .replace(/\{\{user}}/, user)
-                           .replace(/'UA-20043816-1'/, '"'+ga_tracker_key+'"')
                            .replace(/\{\{description}}/, description);
 };
 
 var get_slides = function(req, res, next) {
   var gist_api_url = "https://api.github.com/gists/";
-  var gist_id = req.params.gist_id || default_gist_id;
+  var gist_id = req.params.gist_id || opts.default_gist_id;
   // hits rate limits quickly when auth is omitted
   var authentication = ""; 
-  if( typeof(gh_client_secret) !== "undefined" && 
-      typeof(gh_client_id)     !== "undefined" ){
-    authentication = "?client_id="+gh_client_id+"&client_secret="+gh_client_secret;
+  if( typeof(opts.gh_client_secret) !== "undefined" && 
+      typeof(opts.gh_client_id)     !== "undefined" ){
+    authentication = "?client_id="+opts.gh_client_id+"&client_secret="+opts.gh_client_secret;
   }
   request({
     url: gist_api_url + gist_id + authentication, 

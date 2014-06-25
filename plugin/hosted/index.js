@@ -49,7 +49,7 @@ var ga_tracker_html = function(tracker_id, hostname){
 
 var render_slideshow = function(gist) {
   for(var i in gist.files){
-    if( gist.files[i].type == "text/html"){
+    if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
       var title = i;
       var slides = gist.files[i].content;
       var description = gist.description;

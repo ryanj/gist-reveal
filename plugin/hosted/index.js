@@ -8,9 +8,9 @@ var io			= io.listen(app);
 var request = require('request');
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-  ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+  ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
   web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080',
-  socket_host: process.env.REVEAL_SOCKET_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
+  socket_host: process.env.REVEAL_SOCKET_HOST || process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
   default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
   ga_tracker_key : process.env.GA_TRACKER,

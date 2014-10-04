@@ -6,6 +6,32 @@ var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
 var request = require('request');
+var sanitizeHtml = require('sanitize-html');
+var sanitize = function(slideshow_content){
+  return sanitizeHtml(slideshow_content, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span']),
+    allowedAttributes: {
+      'h1': ['class','style'],
+      'h2': ['class','style'],
+      'h3': ['class','style'],
+      'h4': ['class','style'],
+      'h5': ['class','style'],
+      'h6': ['class','style'],
+      'p': ['class','style'],
+      'div': ['class','style'],
+      'ol': ['class','style'],
+      'ul': ['class','style'],
+      'li': ['class','style'],
+      'pre': ['class','style'],
+      'span': ['class','style'],
+      'aside': ['class'],
+      'code': ['class','style','contenteditable'],
+      'a': ['href', 'name', 'target', 'style','class'],
+      'img': ['src','class','style'],
+      'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background']
+    }
+})}
+
 var opts = {
 	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
   ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -50,9 +76,9 @@ var ga_tracker_html = function(tracker_id, hostname){
 var render_slideshow = function(gist) {
   for(var i in gist.files){
     if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
-      var title = i;
-      var slides = gist.files[i].content;
-      var description = gist.description;
+      var title = sanitize(i);
+      var slides = sanitize(gist.files[i].content);
+      var description = sanitize(gist.description);
       var user = gist.owner.login;
       break;
     }

@@ -44,6 +44,8 @@ Start this project locally by running `npm install` followed by `npm start`.
 
 ## OpenShift Hosting
 
+[![Build Status](https://build-shifter.rhcloud.com:443/buildStatus/icon?job=slide-build)](http://slide-shifter.rhcloud.com)
+
 This application can be launched on any OpenShift cloud using the `rhc` command-line tool:
 
 ```bash

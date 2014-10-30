@@ -1,4 +1,5 @@
 # Gist-Reveal.it
+[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.it.svg)](https://travis-ci.org/ryanj/gist-reveal.it) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.it.svg)](https://david-dm.org/ryanj/gist-reveal.it) [![Deploy](https://img.shields.io/badge/Launch_on-OpenShift-brightgreen.svg)](https://openshift.redhat.com/app/console/application_types/custom?name=slides&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.it.git&cartridges[]=nodejs-0.10)
 
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web.
 
@@ -43,8 +44,6 @@ This token will be stored in the browser's `localStorage` area (per host url) as
 Start this project locally by running `npm install` followed by `npm start`.
 
 ## OpenShift Hosting
-
-[![Build Status](https://build-shifter.rhcloud.com:443/buildStatus/icon?job=slide-build)](http://slide-shifter.rhcloud.com)
 
 This application can be launched on any OpenShift cloud using the `rhc` command-line tool:
 

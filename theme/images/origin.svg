@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="480px" height="320px" viewBox="0 0 480 320" enable-background="new 0 0 480 320" xml:space="preserve">
+<g display="none">
+	<line display="inline" fill="none" stroke="#B35047" x1="32" y1="0" x2="32" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="64" y1="0" x2="64" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="96" y1="0" x2="96" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="128" y1="0" x2="128" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="160" y1="0" x2="160" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="192" y1="0" x2="192" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="224" y1="0" x2="224" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="256" y1="0" x2="256" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="288" y1="0" x2="288" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="320" y1="0" x2="320" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="352" y1="0" x2="352" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="384" y1="0" x2="384" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="416" y1="0" x2="416" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="448" y1="0" x2="448" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="32" x2="480" y2="32"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="64" x2="480" y2="64"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="96" x2="480" y2="96"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="128" x2="480" y2="128"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="160" x2="480" y2="160"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="192" x2="480" y2="192"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="224" x2="480" y2="224"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="256" x2="480" y2="256"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="288" x2="480" y2="288"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="320" x2="480" y2="320"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="352" x2="480" y2="352"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="384" x2="480" y2="384"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="416" x2="480" y2="416"/>
+	<rect display="inline" fill="none" stroke="#B35047" width="480" height="448"/>
+</g>
+<path fill="#FFFFFF" d="M113.209,249.499c-10.255,0-19.035-3.65-26.337-10.954c-7.303-7.304-10.954-16.082-10.954-26.337V48.125
+	c0-10.256,3.651-19.034,10.954-26.337c7.302-7.303,16.082-10.954,26.337-10.954h253.583c10.255,0,19.033,3.651,26.337,10.954
+	c7.303,7.303,10.954,16.081,10.954,26.337v164.083c0,10.255-3.651,19.032-10.954,26.337c-7.304,7.304-16.082,10.954-26.337,10.954
+	H113.209z M105.75,48.125v164.083c0,2.019,0.739,3.767,2.215,5.244c1.476,1.476,3.224,2.214,5.244,2.214h253.583
+	c2.02,0,3.768-0.738,5.244-2.214c1.475-1.478,2.214-3.226,2.214-5.244V48.125c0-2.02-0.739-3.768-2.214-5.244
+	c-1.477-1.476-3.225-2.214-5.244-2.214H113.209c-2.02,0-3.769,0.738-5.244,2.214C106.489,44.357,105.75,46.105,105.75,48.125z
+	 M426.459,264.417h37.291v22.374c0,6.215-3.651,11.499-10.954,15.85c-7.303,4.35-16.082,6.525-26.337,6.525H53.542
+	c-10.255,0-19.035-2.176-26.337-6.525c-7.302-4.35-10.954-9.635-10.954-15.85v-22.374h37.292H426.459z M258.646,286.791
+	c2.484,0,3.729-1.242,3.729-3.729c0-2.484-1.244-3.729-3.729-3.729h-37.291c-2.486,0-3.729,1.244-3.729,3.729
+	c0,2.485,1.243,3.729,3.729,3.729H258.646z"/>
+</svg>

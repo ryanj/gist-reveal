@@ -1,0 +1,67 @@
+/**
+ * OpenShift theme for Reveal.js
+ *
+ * By Emily Dirsh, edirsh@redhat.com
+ * FOR INTERNAL USE ONLY
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+
+// Include theme-specific fonts
+@import "fonts/overpass";
+@import "fonts/opensans";
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #222;
+$mainFont: OpenSans, sans-serif;
+
+$headingFont: 'Overpass', sans-serif;
+$headingColor: white;
+$headingTextTransform: none;
+$headingLetterSpacing: auto;
+$headingTextShadow: none;
+$heading1TextShadow: none;
+
+$linkColor: #6DB3C7;
+
+$selectionBackgroundColor: #6DB3C7;
+$selectionColor: black;
+
+// Background generator
+@mixin bodyBackground() {
+  background-color: #191919;
+  background-image:
+    url('images/logo-wide-white.png'),
+    url('images/mts-bottom-transparent.png'),
+    url('images/planets.png'),
+    url('images/stars.png'),
+    url('images/noise.png');
+  background-repeat:
+    no-repeat,
+    repeat-x,
+    no-repeat,
+    repeat,
+    repeat;
+  background-position: 
+    3% 97%,
+    center bottom,
+    center -130px,
+    100% 122px,
+    0 0;
+  background-size:
+    15%,
+    auto 25%,
+    auto,
+    auto,
+    auto;
+}
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------

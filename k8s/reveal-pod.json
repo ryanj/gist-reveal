@@ -1,0 +1,52 @@
+{
+  "id": "gist-reveal",
+  "kind": "Pod",
+  "apiVersion": "v1beta1",
+  "desiredState": {
+    "manifest": {
+      "version": "v1beta1",
+      "id": "gist-reveal",
+      "containers": [{
+        "name": "gist-reveal",
+        "image": "ryanj/gist-reveal.it",
+        "env": [
+          {
+            "name": "OPENSHIFT_APP_DNS",
+            "value": "${OPENSHIFT_APP_DNS}"
+          },
+          {
+            "name": "IP_ADDR",
+            "value": "${IP_ADDR}"
+          },
+          {
+            "name": "GA_TRACKER",
+            "value": "${GA_TRACKER}"
+          },
+          {
+            "name": "REVEAL_SOCKET_SECRET",
+            "value": "${REVEAL_SOCKET_SECRET}"
+          },
+          {
+            "name": "DEFAULT_GIST",
+            "value": "${DEFAULT_GIST}"
+          },
+          {
+            "name": "GH_CLIENT_ID",
+            "value": "${GH_CLIENT_ID}"
+          },
+          {
+            "name": "GH_CLIENT_SECRET",
+            "value": "${GH_CLIENT_SECRET}"
+          }
+        ],
+        "ports": [{
+          "hostPort": 80,
+          "containerPort": 8080,
+        }]
+      }]
+    }
+  },
+  "labels": {
+    "name": "gist-reveal"
+  }
+}

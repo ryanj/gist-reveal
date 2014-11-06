@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" width="352px" height="384px" viewBox="0 0 352 384" xml:space="preserve">
+<g display="none">
+	<line display="inline" fill="none" stroke="#B35047" x1="32" y1="0" x2="32" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="64" y1="0" x2="64" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="96" y1="0" x2="96" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="128" y1="0" x2="128" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="160" y1="0" x2="160" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="192" y1="0" x2="192" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="224" y1="0" x2="224" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="256" y1="0" x2="256" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="288" y1="0" x2="288" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="320" y1="0" x2="320" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="352" y1="0" x2="352" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="384" y1="0" x2="384" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="416" y1="0" x2="416" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="448" y1="0" x2="448" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="480" y1="0" x2="480" y2="512"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="32" x2="512" y2="32"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="64" x2="512" y2="64"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="96" x2="512" y2="96"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="128" x2="512" y2="128"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="160" x2="512" y2="160"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="192" x2="512" y2="192"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="224" x2="512" y2="224"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="256" x2="512" y2="256"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="288" x2="512" y2="288"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="320" x2="512" y2="320"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="352" x2="512" y2="352"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="384" x2="512" y2="384"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="416" x2="512" y2="416"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="448" x2="512" y2="448"/>
+	<line display="inline" fill="none" stroke="#B35047" x1="0" y1="480" x2="512" y2="480"/>
+	<rect display="inline" fill="none" stroke="#B35047" width="512" height="512"/>
+</g>
+<g>
+	<path fill="#FFFFFF" d="M340.25,11.75C332.417,3.917,323,0,312,0H40C29,0,19.583,3.917,11.75,11.75S0,29,0,40v304
+		c0,11,3.917,20.416,11.75,28.25S29,384,40,384h272c11,0,20.417-3.916,28.25-11.75S352,355,352,344V40
+		C352,29,348.083,19.583,340.25,11.75z M320,344c0,2.166-0.792,4.041-2.375,5.625S314.167,352,312,352H40
+		c-2.167,0-4.042-0.791-5.625-2.375S32,346.166,32,344V40c0-2.167,0.792-4.042,2.375-5.625S37.833,32,40,32h272
+		c2.167,0,4.042,0.792,5.625,2.375S320,37.833,320,40V344z"/>
+	<path fill="#FFFFFF" d="M64.333,74.083v55h223.999v-55H64.333z M84.832,101.583c0-4.51,3.656-8.167,8.167-8.167
+		s8.167,3.656,8.167,8.167c0,4.511-3.656,8.167-8.167,8.167S84.832,106.094,84.832,101.583z"/>
+	<circle display="none" fill="#FFFFFF" cx="115.667" cy="93.666" r="8.167"/>
+	<rect x="64.333" y="164.5" display="none" fill="#FFFFFF" width="224" height="55"/>
+	<rect x="64.333" y="255" display="none" fill="#FFFFFF" width="224" height="55"/>
+	<path fill="#FFFFFF" d="M64.333,164.083v55h223.999v-55H64.333z M84.832,191.583c0-4.51,3.656-8.167,8.167-8.167
+		s8.167,3.656,8.167,8.167c0,4.511-3.656,8.167-8.167,8.167S84.832,196.094,84.832,191.583z"/>
+	<path fill="#FFFFFF" d="M64.333,254.083v55h223.999v-55H64.333z M84.832,281.583c0-4.511,3.656-8.167,8.167-8.167
+		s8.167,3.656,8.167,8.167s-3.656,8.167-8.167,8.167S84.832,286.094,84.832,281.583z"/>
+</g>
+</svg>

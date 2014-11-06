@@ -5,7 +5,7 @@ RUN yum install -y npm
 RUN yum install -y git
 RUN yum install -y bzip2
 
-RUN git clone https://github.com/ryanj/gist-reveal.it.git /app
+RUN git -b openshift_v3 clone https://github.com/danehans/gist-reveal.it.git /app
 
 WORKDIR /app
 

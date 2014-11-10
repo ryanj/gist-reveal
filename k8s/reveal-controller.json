@@ -1,0 +1,53 @@
+{
+  "id": "gist-reveal-controller",
+  "kind": "ReplicationController",
+  "apiVersion": "v1beta1",
+  "desiredState": {
+    "replicas": 2,
+    "replicaSelector": {"name": "gist-reveal"},
+    "podTemplate": {
+      "desiredState": {
+         "manifest": {
+           "version": "v1beta1",
+           "id": "gsit-reveal-controller",
+           "containers": [{
+             "name": "gist-reveal",
+             "image": "ryanj/gist-reveal.it",
+             "env": [
+               {
+                 "name": "OPENSHIFT_APP_DNS",
+                 "value": "${OPENSHIFT_APP_DNS}"
+               },
+               {
+                 "name": "IP_ADDR",
+                 "value": "${IP_ADDR}"
+               },
+               {
+                 "name": "GA_TRACKER",
+                 "value": "${GA_TRACKER}"
+               },
+               {
+                 "name": "REVEAL_SOCKET_SECRET",
+                 "value": "${REVEAL_SOCKET_SECRET}"
+               },
+               {
+                 "name": "DEFAULT_GIST",
+                 "value": "${DEFAULT_GIST}"
+               },
+               {
+                 "name": "GH_CLIENT_ID",
+                 "value": "${GH_CLIENT_ID}"
+               },
+               {
+                 "name": "GH_CLIENT_SECRET",
+                 "value": "${GH_CLIENT_SECRET}"
+               }
+             ],
+             "ports": [{"containerPort": 8080}]
+           }]
+         }
+       },
+       "labels": {"name": "gist-reveal"}
+      }},
+  "labels": {"name": "gist-reveal"}
+}

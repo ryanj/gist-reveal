@@ -45,6 +45,7 @@ var opts = {
   socket_host: process.env.REVEAL_SOCKET_HOST || process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
   default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
+  theme : process.env.REVEAL_THEME || 'gist-reveal',
   ga_tracker_key : process.env.GA_TRACKER,
   gh_client_secret : process.env.GH_CLIENT_SECRET,
   gh_client_id : process.env.GH_CLIENT_ID,
@@ -95,6 +96,7 @@ var render_slideshow = function(gist) {
                            .replace(/\{\{title}}/, title)
                            .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(opts.ga_tracker_key, opts.web_host))
                            .replace(/\{\{hostname}}/, opts.web_host)
+                           .replace(/\{\{theme}}/, opts.theme)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description);
 };

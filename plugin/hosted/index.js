@@ -46,6 +46,9 @@ var opts = {
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
   default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
   theme : process.env.REVEAL_THEME || 'gist-reveal',
+  template_logo_text : process.env.TEMPLATE_LOGO_TEXT || "Launch on OpenShift",
+  template_logo_img : process.env.TEMPLATE_LOGO_IMG || "img/launchbutton.svg",
+  template_logo_url : process.env.TEMPLATE_LOGO_URL || "https://openshift.redhat.com/app/console/application_types/custom?name=slides&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.it.git&cartridges[]=nodejs-0.10",
   ga_tracker_key : process.env.GA_TRACKER,
   gh_client_secret : process.env.GH_CLIENT_SECRET,
   gh_client_id : process.env.GH_CLIENT_ID,
@@ -97,6 +100,9 @@ var render_slideshow = function(gist) {
                            .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(opts.ga_tracker_key, opts.web_host))
                            .replace(/\{\{hostname}}/, opts.web_host)
                            .replace(/\{\{theme}}/, opts.theme)
+                           .replace(/\{\{template_logo_url}}/, opts.template_logo_url)
+                           .replace(/\{\{template_logo_text}}/, opts.template_logo_text)
+                           .replace(/\{\{template_logo_img}}/, opts.template_logo_img)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description);
 };

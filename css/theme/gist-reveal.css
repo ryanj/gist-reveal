@@ -124,9 +124,6 @@ body {
 .reveal .controls div.navigate-up.enabled:hover {
   border-bottom-color: #71e9f4; }
 
-.reveal #slide-template-logo {
-  position:fixed;width:14%;z-index:30;bottom:2%;left:2%;}
-
 .reveal .controls div.navigate-down.enabled:hover {
   border-top-color: #71e9f4; }
 

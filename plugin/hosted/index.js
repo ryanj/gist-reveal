@@ -5,8 +5,10 @@ var crypto		= require('crypto');
 var app			= express.createServer();
 var staticDir	= express.static;
 var io			= io.listen(app);
+var path    = require('path');
 var request = require('request');
 var sanitizeHtml = require('sanitize-html');
+var mkdirp  = require('mkdirp');
 var sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span']),
@@ -45,7 +47,8 @@ var opts = {
   socket_host: process.env.REVEAL_SOCKET_HOST || process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
   socket_secret : process.env.REVEAL_SOCKET_SECRET,
   default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
-  theme : process.env.REVEAL_THEME || 'gist-reveal',
+  theme : process.env.REVEAL_THEME || '60e54843de11a545897e',
+  install_gist_themes : process.env.GIST_THEMES || "true",
   template_logo_text : process.env.TEMPLATE_LOGO_TEXT || "Launch on OpenShift",
   template_logo_img : process.env.TEMPLATE_LOGO_IMG || "img/launchbutton.svg",
   template_logo_url : process.env.TEMPLATE_LOGO_URL || "https://openshift.redhat.com/app/console/application_types/custom?name=slides&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.it.git&cartridges[]=nodejs-0.10",
@@ -83,7 +86,7 @@ var ga_tracker_html = function(tracker_id, hostname){
   }
 };
 
-var render_slideshow = function(gist) {
+var render_slideshow = function(gist, theme, cb) {
   for(var i in gist.files){
     if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
       var title = sanitize(i);
@@ -93,23 +96,91 @@ var render_slideshow = function(gist) {
       break;
     }
   }
-  return slideshow_template.toString()
+  get_theme(theme, function(themename){
+    cb(slideshow_template.toString()
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)
                            .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(opts.ga_tracker_key, opts.web_host))
                            .replace(/\{\{hostname}}/, opts.web_host)
-                           .replace(/\{\{theme}}/, opts.theme)
+                           .replace(/\{\{theme}}/, themename)
                            .replace(/\{\{template_logo_url}}/, opts.template_logo_url)
                            .replace(/\{\{template_logo_text}}/, opts.template_logo_text)
                            .replace(/\{\{template_logo_img}}/, opts.template_logo_img)
                            .replace(/\{\{user}}/, user)
-                           .replace(/\{\{description}}/, description);
+                           .replace(/\{\{description}}/, description)
+  )});
 };
 
+var install_theme = function(gist){
+  var title, data;
+  var theme_folder = path.resolve('css','theme',gist.id);
+  console.log("installing gist: "+gist.id);
+  mkdirp(theme_folder);
+  for(var i in gist.files){
+    filenm = gist.files[i].filename;
+    data = gist.files[i].content;
+    if( gist.files[i].type == "text/css"){
+      filename = path.resolve('css','theme',gist.id,gist.id+".css")
+      fs.writeFile(filename, data, function(err){
+        console.log('theme installed: '+gist.id);
+      });
+    }else{
+      filename = path.resolve('css','theme',gist.id,filenm)
+      request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename))
+    }
+  }
+}
+
+var get_theme = function(gist_id, cb) {
+  if( opts.install_gist_themes == 'false' ){
+    // if theme installation is disabled, return immediately
+    cb(gist_id)
+  }
+  var theme_folder = path.resolve( 'css','theme', gist_id );
+  //if theme is found locally, return gist_id;
+  fs.stat( theme_folder, function(err, stats){
+    if(!err){
+      //console.log("not installing locally available theme: " + gist_id);
+      cb(gist_id+'/'+gist_id);
+    }else{
+      //console.log("installing css theme: " + gist_id);
+      get_gist(gist_id, function(error, response, api_response){
+        //cache the content
+        if (!error && response.statusCode == 200) {
+          gist = JSON.parse(api_response);
+          install_theme(gist);
+          console.log("gist retrieved : " + gist_id);
+          cb(gist_id+'/'+gist_id)
+        }else{
+          //not found
+          console.log("gist not found");
+          cb(gist_id)
+        }
+      })
+    }
+  })
+}
+
 var get_slides = function(req, res, next) {
+  var gist_id = req.param('gist_id', opts.default_gist_id);
+  var theme = req.param('theme', opts.theme);
+  get_gist(gist_id, function (error, response, api_response) {
+    if (!error && response.statusCode == 200) {
+      gist = JSON.parse(api_response);
+    }else if (response.statusCode == 403){
+      gist = rate_limit_slides;
+    }else{
+      gist = error_slides;
+    }
+    render_slideshow(gist, theme, function(slides){
+      return res.send(slides, 200, {'Content-Type': 'text/html'});
+    });
+  });
+}
+
+var get_gist = function(gist_id, cb) {
   var gist_api_url = "https://api.github.com/gists/";
-  var gist_id = req.params.gist_id || opts.default_gist_id;
   // hits rate limits quickly when auth is omitted
   var authentication = ""; 
   if( typeof(opts.gh_client_secret) !== "undefined" && 
@@ -119,17 +190,8 @@ var get_slides = function(req, res, next) {
   request({
     url: gist_api_url + gist_id + authentication, 
     headers: {'User-Agent': 'request'}
-  },function (error, response, api_response) {
-    if (!error && response.statusCode == 200) {
-      gist = JSON.parse(api_response);
-    }else if (response.statusCode == 403){
-      gist = rate_limit_slides;
-    }else{
-      gist = error_slides;
-    }
-    return res.send(render_slideshow(gist), 200, {'Content-Type': 'text/html'});
-  });
-};
+  }, cb)
+}
 
 app.get("/", get_slides);
 app.get("/:gist_id", get_slides);
@@ -191,7 +253,11 @@ var getClientConfig = function(){
 };
 
 // Actually listen
-app.listen(opts.port, opts.ipAddr);
+app.listen(opts.port, opts.ipAddr, function(){
+  get_theme(opts.theme, function(){
+    //if the default theme is a gist_id, prime the cache 
+  })
+});
 
 var brown = '\033[33m',
 	green = '\033[32m',

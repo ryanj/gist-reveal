@@ -22,8 +22,8 @@
     "node": "~0.8.0"
   },
   "dependencies": {
-    "crypto": "0.0.3",
     "express": "~2.5.9",
+    "mkdirp": "^0.5.0",
     "mustache": "~0.7.2",
     "request": "^2.36.0",
     "sanitize-html": "^1.4.2",

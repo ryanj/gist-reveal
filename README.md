@@ -89,6 +89,22 @@ export GA_TRACKER=YOUR_GA_TRACKER
 $GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal.it/reveal-pod.json
 ```
 
+To build and deploy your own Docker image for Gist-Reveal.It on OpenShiftM5, use the file `k8s/reveal-dockerbuild.json` as follows.
+
+- Make sure OpenShift is running with a local Docker registry, and obtain the IP address of the registry with a command such as `osc get services`. It will likely have the form 172.30.17.x.
+- Update `k8s/reveal-dockerbuild.json`, replacing all references to `172.30.17.x` with the IP of your local Docker registry.
+- In the same file, add the values of any environment variables you wish to set in the "parameters" section, such as GA_TRACKER, GH_CLIENT_ID, and GH_CLIENT_SECRET.
+- If you have forked this repository and wish to build from your copy, update `https://github.com/ryanj/gist-reveal.it.git` in `reveal-dockerbuild.json` to point to your fork.
+- Run the following commands to process and apply the config, and trigger a build. 
+
+```
+osc process -f reveal-stibuild.json | osc apply -f -
+curl -X POST http://localhost:8080/osapi/v1beta1/buildConfigHooks/gist-reveal-build/secret101/generic
+```
+
+- To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `osc build-logs`. For example: `osc build-logs 4af7a5cd-8b21-11e4-85b4-853a4bcdbfe0`.
+- When the build is complete, you should be able to view Gist-Reveal.It in your browser at the IP address found in the output of `osc get services`.
+
 ## License
 
 [gist-reveal,it](http://gist-reveal.it/) was created at the first [DockerCon Hackathon](http://blog.docker.com/2014/07/dockercon-video-dockercon-hackathon-winners/) by [@ryanj](https://github.com/ryanj) and [@fkautz](https://github.com/fkautz).

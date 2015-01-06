@@ -80,8 +80,10 @@ A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-revea
 
 ```bash
 export DEFAULT_GIST=YOUR_DEFAULT_GIST_ID 
+export IP_ADDR=0.0.0.0
+export OPENSHIFT_APP_DNS=gist-reveal.it
 export GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET 
-export GH_CLIENT_ID=YOUR_GH_CLIENT_ID 
+export GH_CLIENT_ID=YOUR_GH_CLIENT_ID
 export REVEAL_SOCKET_SECRET=0P3N-S0URC3 
 export GA_TRACKER=YOUR_GA_TRACKER
 $GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal.it/reveal-pod.json

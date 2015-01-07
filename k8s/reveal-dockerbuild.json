@@ -7,21 +7,25 @@
   "description": "Builds the Gist-Reveal.It application for OpenShift Origin v3",
   "parameters": [
     {
+      "name": "REVEAL_SOCKET_SECRET",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{10}"
+    },
+    {
       "name": "IP_ADDR",
       "value": "0.0.0.0"
+    },
+    {
+      "name": "OPENSHIFT_APP_DNS",
+      "value": ""
     },
     {
       "name": "GA_TRACKER",
       "value": ""
     },
     {
-      "name": "REVEAL_SOCKET_SECRET",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{24}"
-    },
-    {
       "name": "DEFAULT_GIST",
-      "value": "af84d40e58c5c2a908dd"
+      "value": ""
     },
     {
       "name": "GH_CLIENT_ID",
@@ -130,6 +134,10 @@
                     "name": "gist-reveal-app",
                     "image": "172.30.17.x:5001/openshift/gist-reveal",
                     "env": [
+                      {
+                        "name": "OPENSHIFT_APP_DNS",
+                        "value": "${OPENSHIFT_APP_DNS}"
+                      },
                       {
                         "name": "IP_ADDR",
                         "value": "${IP_ADDR}"

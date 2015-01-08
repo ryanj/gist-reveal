@@ -1,0 +1,183 @@
+{
+  "metadata":{
+    "name": "gist-reveal-it",
+  }, 
+  "kind": "Template",
+  "apiVersion": "v1beta1",
+  "description": "Builds the Gist-Reveal.It application for OpenShift Origin v3",
+  "parameters": [
+    {
+      "name": "REVEAL_SOCKET_SECRET",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{10}"
+    },
+    {
+      "name": "IP_ADDR",
+      "value": "0.0.0.0"
+    },
+    {
+      "name": "OPENSHIFT_APP_DNS",
+      "value": ""
+    },
+    {
+      "name": "GA_TRACKER",
+      "value": ""
+    },
+    {
+      "name": "DEFAULT_GIST",
+      "value": ""
+    },
+    {
+      "name": "GH_CLIENT_ID",
+      "value": ""
+    },
+    {
+      "name": "GH_CLIENT_SECRET",
+      "value": ""
+    }
+  ],
+  "items": [
+    {
+      "id": "gist-reveal-service",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 80,
+      "containerPort": 8080,
+      "selector": {
+        "name": "gist-reveal-service"
+      }
+    },
+    {
+      "metadata":{
+        "name": "gist-reveal",
+      }, 
+      "kind": "ImageRepository",
+      "apiVersion": "v1beta1",
+      "dockerImageRepository": "172.30.17.x:5001/openshift/gist-reveal",
+      "labels": {
+        "name": "gist-reveal"
+      }
+    },
+    {
+      "metadata":{
+        "name": "gist-reveal-build",
+      },
+      "kind": "BuildConfig",
+      "apiVersion": "v1beta1",
+      "triggers": [
+        {
+          "type": "github",
+          "github": {
+            "secret": "secret101"
+          }
+        },
+        {
+          "type": "generic",
+          "generic": {
+            "secret": "secret101"
+          }
+        }
+      ],
+      "parameters": {
+        "source" : {
+          "type" : "Git",
+          "git" : {
+            "uri": "https://github.com/ryanj/gist-reveal.it.git"
+          }
+        },
+        "strategy": {
+          "type": "Docker"
+        },
+        "output": {
+          "imageTag": "openshift/gist-reveal:latest",
+          "registry": "172.30.17.x:5001"
+        },
+      },
+      "labels": {
+        "name": "gist-reveal-build"
+      }
+    },
+    {
+      "metadata":{
+        "name": "gist-reveal-service",
+      },
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1beta1",
+      "triggers": [
+        {
+          "type": "ImageChange",
+          "imageChangeParams": {
+            "automatic": true,
+            "containerNames": [
+              "gist-reveal-app"
+            ],
+            "repositoryName": "172.30.17.x:5001/openshift/gist-reveal",
+            "tag": "latest"
+          }
+        }
+      ],
+      "template": {
+        "strategy":{
+          "type":"Recreate"
+        },
+        "controllerTemplate": {
+          "replicas": 2,
+          "replicaSelector": {
+            "name": "gist-reveal-service"
+          },
+          "podTemplate": {
+            "desiredState": {
+              "manifest": {
+                "version": "v1beta1",
+                "containers": [
+                  {
+                    "name": "gist-reveal-app",
+                    "image": "172.30.17.x:5001/openshift/gist-reveal",
+                    "env": [
+                      {
+                        "name": "OPENSHIFT_APP_DNS",
+                        "value": "${OPENSHIFT_APP_DNS}"
+                      },
+                      {
+                        "name": "IP_ADDR",
+                        "value": "${IP_ADDR}"
+                      },
+                      {
+                        "name": "GA_TRACKER",
+                        "value": "${GA_TRACKER}"
+                      },
+                      {
+                        "name": "REVEAL_SOCKET_SECRET",
+                        "value": "${REVEAL_SOCKET_SECRET}"
+                      },
+                      {
+                        "name": "DEFAULT_GIST",
+                        "value": "${DEFAULT_GIST}"
+                      },
+                      {
+                        "name": "GH_CLIENT_ID",
+                        "value": "${GH_CLIENT_ID}"
+                      },
+                      {
+                        "name": "GH_CLIENT_SECRET",
+                        "value": "${GH_CLIENT_SECRET}"
+                      }
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 8080
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "labels": {
+              "name": "gist-reveal-service"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

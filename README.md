@@ -82,12 +82,34 @@ A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-revea
 
 ```bash
 export DEFAULT_GIST=YOUR_DEFAULT_GIST_ID 
+export IP_ADDR=0.0.0.0
+export OPENSHIFT_APP_DNS=gist-reveal.it
 export GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET 
-export GH_CLIENT_ID=YOUR_GH_CLIENT_ID 
+export GH_CLIENT_ID=YOUR_GH_CLIENT_ID
 export REVEAL_SOCKET_SECRET=0P3N-S0URC3 
 export GA_TRACKER=YOUR_GA_TRACKER
 $GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal.it/reveal-pod.json
 ```
+
+To build and deploy your own Docker image for Gist-Reveal.It on OpenShiftM5, use the file `k8s/reveal-dockerbuild.json` as follows.
+
+- Make sure OpenShift is running with a local Docker registry, and obtain the IP address of the registry with a command such as `osc get services`. It will likely have the form 172.30.17.x.
+- Update `k8s/reveal-dockerbuild.json`, replacing all references to `172.30.17.x` with the IP of your local Docker registry.
+- If you have forked this repository and wish to build from your copy, update `https://github.com/ryanj/gist-reveal.it.git` in `reveal-dockerbuild.json` to point to your fork.
+- Run a command such as the following to process and apply the configuration. Include values for any config parameters you wish to set/override:
+
+```
+osc process -f reveal-stibuild.json -v DEFAULT_GIST=${DEFAULT_GIST},GH_CLIENT_ID=${GH_CLIENT_ID},GH_CLIENT_SECRET=${GH_CLIENT_SECRET},REVEAL_SOCKET_SECRET=${REVEAL_SOCKET_SECRET} | osc apply -f -
+```
+
+- Run the following command to trigger a build.
+
+```
+curl -X POST http://localhost:8080/osapi/v1beta1/buildConfigHooks/gist-reveal-build/secret101/generic
+```
+
+- To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `osc build-logs`. For example: `osc build-logs 4af7a5cd-8b21-11e4-85b4-853a4bcdbfe0`.
+- When the build is complete, you should be able to view Gist-Reveal.It in your browser at the IP address found in the output of `osc get services`.
 
 ## License
 

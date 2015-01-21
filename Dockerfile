@@ -1,13 +1,14 @@
+MAINTAINER ryanj <ryanj@redhat.com>
 FROM fedora
 
 RUN yum -y update && yum clean all
-RUN yum -y install npm git bzip2 && yum clean all
+RUN yum -y install npm git bzip2 curl build-essential ca-certificates && yum clean all
 
 WORKDIR /app
 
-ONBUILD ADD package.json /app/
-ONBUILD RUN npm install
-ONBUILD ADD . /app
+ADD package.json /app/
+RUN npm install
+ADD . /app/
 
 EXPOSE 8080
 

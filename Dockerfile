@@ -1,16 +1,12 @@
 FROM fedora
 
-RUN yum install -y nodejs
-RUN yum install -y npm
-RUN yum install -y git
-RUN yum install -y bzip2
+RUN yum -y update && yum clean all
+RUN yum -y install npm git bzip2 && yum clean all
 
-COPY . /app
+ADD . /src
 
-WORKDIR /app
-
-RUN cd /app; npm install
+RUN cd /src; npm install
 
 EXPOSE 8080
 
-CMD OPENSHIFT_NODEJS_IP=0.0.0.0 npm start
+CMD ["npm", "start"]

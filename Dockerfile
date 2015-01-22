@@ -7,7 +7,7 @@ RUN yum -y install npm git bzip2 curl build-essential ca-certificates && yum cle
 WORKDIR /app
 
 ADD package.json /app/
-RUN npm install
+RUN npm install --production
 ADD . /app/
 
 EXPOSE 8080

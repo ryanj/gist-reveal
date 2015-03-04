@@ -53,7 +53,7 @@ This application can be launched on any OpenShift cloud using the `rhc` command-
 
 ```bash
 rhc app create gistreveal nodejs-0.10 \
---from code=http://github.com/ryanj/gist-reveal.it \ 
+--from-code=http://github.com/ryanj/gist-reveal.it \ 
 DEFAULT_GIST=YOUR_DEFAULT_GIST_ID \ 
 GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET \ 
 GH_CLIENT_ID=YOUR_GH_CLIENT_ID \ 

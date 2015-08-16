@@ -1,0 +1,160 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "gistreveal-dockerhub",
+        "creationTimestamp": null,
+        "annotations": {
+            "name": "gistreveal-dockerhub",
+            "description": "Gist-powered Reveal.js slides",
+            "provider": "ryanj",
+            "iconClass": "icon-nodejs",
+            "tags": "instant-app,nodejs"
+        }
+    },
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gist-reveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "dockerImageRepository": "ryanj/gist-reveal:latest"
+            },
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gist-reveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "strategy": {
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "gist-reveal"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "gist-reveal:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "gist-reveal"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentconfig": "gist-reveal"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "gist-reveal",
+                                "image": "ryanj/gist-reveal",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {}
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gist-reveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080,
+                        "nodePort": 0
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "gist-reveal"
+                }
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gist-reveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "host": "",
+                "to": {
+                    "kind": "Service",
+                    "name": "gist-reveal"
+                }
+            },
+            "status": {}
+        }
+    ],
+    "parameters": [
+        {
+            "description": "OpenShift OAuth token (REQUIRED)",
+            "value": "Missing!",
+            "name": "ACCESS_TOKEN"
+        },
+        {
+            "description": "builder image",
+            "value": "openshift/nodejs-010-centos7",
+            "name": "BUILDER_IMAGE"
+        },
+        {
+            "description": "The total number of hexagons (containers) to display in the UI",
+            "value": "small",
+            "name": "GISTREVEAL_SIZE"
+        },
+        {
+            "description": "Generic webhook secret",
+            "from": "[a-zA-Z0-9_]{16}",
+            "generate": "expression",
+            "name": "GENERIC_WEBHOOK_SECRET"
+        },
+        {
+            "description": "GitHub webhook secret",
+            "from": "[a-zA-Z0-9_]{16}",
+            "generate": "expression",
+            "name": "GITHUB_WEBHOOK_SECRET"
+        }
+    ]
+}

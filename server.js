@@ -1,9 +1,9 @@
-var express		= require('express');
+var express		= require('reveal.js/node_modules/express');
 var fs			= require('fs');
-var io			= require('socket.io');
+var io			= require('reveal.js/node_modules/socket.io');
 var crypto		= require('crypto');
 var app			= express.createServer();
-var staticDir	= express.static;
+var ecstatic            = require('ecstatic');
 var io			= io.listen(app);
 var path    = require('path');
 var request = require('request');
@@ -41,7 +41,7 @@ var sanitize = function(slideshow_content){
 })}
 
 var opts = {
-	port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+  port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
   ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
   web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080',
   socket_host: process.env.REVEAL_SOCKET_HOST || process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
@@ -55,23 +55,18 @@ var opts = {
   ga_tracker_key : process.env.GA_TRACKER,
   gh_client_secret : process.env.GH_CLIENT_SECRET,
   gh_client_id : process.env.GH_CLIENT_ID,
-	baseDir : __dirname + '/../../'
+  baseDir : __dirname 
 };
 var rate_limit_slides = require('./rate_limit_response.json');
 var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
 var slideshow_template = fs.readFileSync(opts.baseDir + '/index.html');
 
+
 var createHash = function(secret) {
 	var cipher = crypto.createCipher('blowfish', secret);
 	return(cipher.final('hex'));
 };
-
-app.configure(function() {
-	[ 'css', 'js', 'plugin', 'lib', 'img' ].forEach(function(dir) {
-		app.use('/' + dir, staticDir(opts.baseDir + dir));
-	});
-});
 
 var ga_tracker_html = function(tracker_id, hostname){
   if(typeof(tracker_id) !== 'undefined'){
@@ -97,7 +92,7 @@ var render_slideshow = function(gist, theme, cb) {
     }
   }
   get_theme(theme, function(themename){
-    cb(slideshow_template.toString()
+    var index = cb(slideshow_template.toString()
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)
@@ -109,7 +104,9 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{template_logo_img}}/, opts.template_logo_img)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
-  )});
+    )
+    return index;
+  });
 };
 
 var install_theme = function(gist){
@@ -174,7 +171,8 @@ var get_slides = function(req, res, next) {
       gist = error_slides;
     }
     render_slideshow(gist, theme, function(slides){
-      return res.send(slides, 200, {'Content-Type': 'text/html'});
+      res.send(slides);
+      //return next();
     });
   });
 }
@@ -193,8 +191,6 @@ var get_gist = function(gist_id, cb) {
   }, cb)
 }
 
-app.get("/", get_slides);
-app.get("/:gist_id", get_slides);
 
 app.get("/token", function(req,res) {
   res.send('Information about setting up your presentation environment is available in the server logs');
@@ -251,6 +247,9 @@ var getClientConfig = function(){
   var tokens = getTokens();
   return "hosted:{ id: '"+tokens.socket_id+"', url: '"+opts.socket_host+"'}";
 };
+app.get("/", get_slides);
+app.use(ecstatic({ root: __dirname, showDir: false, handleError: false }));
+app.get("/:gist_id", get_slides);
 
 // Actually listen
 app.listen(opts.port, opts.ipAddr, function(){

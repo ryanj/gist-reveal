@@ -1,49 +1,36 @@
 {
-  "name": "reveal.js",
-  "version": "2.6.2",
-  "description": "The HTML Presentation Framework",
-  "homepage": "http://lab.hakim.se/reveal-js",
-  "subdomain": "revealjs",
-  "main": "plugin/hosted/index.js",
+  "name": "gist-reveal",
+  "version": "0.2.0",
+  "description": "Gist-powered Reveal.js slides",
+  "homepage": "http://gist-reveal.it",
+  "main": "server.js",
   "scripts": {
-    "test": "grunt test",
-    "start": "node plugin/hosted"
+    "start": "node server.js"
   },
   "author": {
-    "name": "Hakim El Hattab",
-    "email": "hakim.elhattab@gmail.com",
-    "web": "http://hakim.se"
+    "name": "ryanj",
+    "email": "ryan@ryanjarvinen.com",
+    "web": "http://ryanjarvinen.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hakimel/reveal.js.git"
+    "url": "git://github.com/ryanj/gist-reveal.git"
   },
   "engines": {
-    "node": "~0.8.0"
+    "node": "~0.10.0"
   },
   "dependencies": {
-    "express": "~2.5.9",
-    "mkdirp": "^0.5.0",
-    "socket.io": "~0.9.16",
-    "mustache": "^1.0.0",
-    "request": "^2.51.0",
-    "sanitize-html": "^1.5.1",
-    "underscore": "^1.7.0"
-  },
-  "devDependencies": {
-    "grunt-contrib-qunit": "~0.5.2",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-contrib-cssmin": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-sass": "~0.14.0",
-    "grunt-contrib-connect": "~0.8.0",
-    "grunt-autoprefixer": "~1.0.1",
-    "grunt-zip": "~0.7.0",
-    "grunt": "~0.4.0",
-    "node-sass": "~0.9.3"
+    "ecstatic": "^0.8.0",
+    "mkdirp": "^0.5.1",
+    "request": "^2.60.0",
+    "reveal.js": "^3.1.0",
+    "sanitize-html": "^1.8.0"
   },
   "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/ryanj/gist-reveal/blob/master/LICENSE"
+    },
     {
       "type": "MIT",
       "url": "https://github.com/hakimel/reveal.js/blob/master/LICENSE"

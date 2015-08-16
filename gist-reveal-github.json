@@ -1,0 +1,239 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "gistreveal",
+        "creationTimestamp": null,
+        "annotations": {
+            "name": "gistreveal",
+            "description": "Gist-powered Reveal.js slides",
+            "provider": "ryanj",
+            "iconClass": "icon-nodejs",
+            "tags": "instant-app,nodejs"
+        }
+    },
+    "objects": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gistreveal",
+                "creationTimestamp": null
+            },
+            "spec": {},
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gistreveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "http://github.com/ryanj/gist-reveal"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "${BUILDER_IMAGE}:latest"
+                        },
+                        "incremental": true
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "gistreveal:latest"
+                    }
+                },
+                "resources": {}
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gistreveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate",
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "gistreveal"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "gistreveal:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "gistreveal"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentconfig": "gistreveal"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "gistreveal",
+                                "image": "gistreveal:latest",
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/status",
+                                        "port": 8080
+                                    },
+                                    "timeoutSeconds": 5,
+                                    "initialDelaySeconds": 30
+                                },
+                                "env": [
+                                    {
+                                        "name": "GISTREVEAL_SIZE",
+                                        "value": "${GISTREVEAL_SIZE}"
+                                    },
+                                    {
+                                        "name": "ACCESS_TOKEN",
+                                        "value": "${ACCESS_TOKEN}"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "name": "gistrevealtcp",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always",
+                                "securityContext": {
+                                    "capabilities": {},
+                                    "privileged": false
+                                }
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "dnsPolicy": "ClusterFirst"
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gistreveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "gistrevealtcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080,
+                        "nodePort": 0
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "gistreveal"
+                },
+                "portalIP": "",
+                "type": "ClusterIP"
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "gistreveal",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "host": "",
+                "to": {
+                    "kind": "Service",
+                    "name": "gistreveal"
+                }
+            },
+            "status": {}
+        }
+    ],
+    "parameters": [
+        {
+            "description": "OpenShift OAuth token (REQUIRED)",
+            "value": "Missing!",
+            "name": "ACCESS_TOKEN"
+        },
+        {
+            "description": "builder image",
+            "value": "openshift/nodejs-010-centos7",
+            "name": "BUILDER_IMAGE"
+        },
+        {
+            "description": "The total number of hexagons (containers) to display in the UI",
+            "value": "small",
+            "name": "GISTREVEAL_SIZE"
+        },
+        {
+            "description": "Generic webhook secret",
+            "from": "[a-zA-Z0-9_]{16}",
+            "generate": "expression",
+            "name": "GENERIC_WEBHOOK_SECRET"
+        },
+        {
+            "description": "GitHub webhook secret",
+            "from": "[a-zA-Z0-9_]{16}",
+            "generate": "expression",
+            "name": "GITHUB_WEBHOOK_SECRET"
+        }
+    ]
+}

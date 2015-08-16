@@ -1,7 +1,7 @@
-# Gist-Reveal.it 
-[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.it.svg)](https://travis-ci.org/ryanj/gist-reveal.it) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.it.svg)](https://david-dm.org/ryanj/gist-reveal.it) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
+# Gist-Reveal
+[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.svg)](https://travis-ci.org/ryanj/gist-reveal) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.svg)](https://david-dm.org/ryanj/gist-reveal.it) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
 
-[![Launch on OpenShift](http://launch-shifter.rhcloud.com/launch/LAUNCH ON.svg)](https://openshift.redhat.com/app/console/application_type/custom?&cartridges[]=nodejs-0.10&initial_git_url=https://github.com/ryanj/gist-reveal.it.git&name=slides)
+[![Launch on OpenShift](http://launch-shifter.rhcloud.com/launch/LAUNCH ON.svg)](https://openshift.redhat.com/app/console/application_type/custom?&cartridges[]=nodejs-0.10&initial_git_url=https://github.com/ryanj/gist-reveal.git&name=slides)
 
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web.
 
@@ -53,7 +53,7 @@ This application can be launched on any OpenShift cloud using the `rhc` command-
 
 ```bash
 rhc app create gistreveal nodejs-0.10 \
---from-code=http://github.com/ryanj/gist-reveal.it \ 
+--from-code=http://github.com/ryanj/gist-reveal \ 
 DEFAULT_GIST=YOUR_DEFAULT_GIST_ID \ 
 GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET \ 
 GH_CLIENT_ID=YOUR_GH_CLIENT_ID \ 
@@ -61,24 +61,24 @@ REVEAL_SOCKET_SECRET=0P3N-S0URC3 \
 GA_TRACKER=YOUR_GA_TRACKER
 ```
 
-Or, [click here to launch on the web](https://openshift.redhat.com/app/console/application_types/custom?name=reveal&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.it.git&cartridges[]=nodejs-0.10)!
+Or, [click here to launch on the web](https://openshift.redhat.com/app/console/application_types/custom?name=reveal&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.git&cartridges[]=nodejs-0.10)!
 
 Then, use the `rhc env set` command to publish [configuration strings](#application-config) into the application's system environment.
 
 ## Docker 
 
-To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal.it/) locally on port `8080`:
+To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
 
-    docker pull ryanj/gist-reveal.it
-    docker run -d -p 8080:8080 ryanj/gist-reveal.it
+    docker pull ryanj/gist-reveal
+    docker run -d -p 8080:8080 ryanj/gist-reveal
 
 [Environment variables](#Application_Config) can be passed into the Docker container in order to configure the websocket relay, or to change the default slideshow content: 
 
-    docker run -e "REVEAL_WEB_HOST=YOUR_HOSTNAME_HERE" -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal.it
+    docker run -e "REVEAL_WEB_HOST=YOUR_HOSTNAME_HERE" -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
     
 ### OpenShiftM5 & Kubernetes 
 
-A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-reveal.it/blob/master/reveal-pod.json) is included for running [this project's Docker build](https://registry.hub.docker.com/u/ryanj/gist-reveal.it/) on [an OriginM5 hosting environment](https://github.com/openshift/origin#getting-started):
+A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-reveal/blob/master/reveal-pod.json) is included for running [this project's Docker build](https://registry.hub.docker.com/u/ryanj/gist-reveal/) on [an OriginM5 hosting environment](https://github.com/openshift/origin#getting-started):
 
 ```bash
 export DEFAULT_GIST=YOUR_DEFAULT_GIST_ID 
@@ -88,14 +88,14 @@ export GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET
 export GH_CLIENT_ID=YOUR_GH_CLIENT_ID
 export REVEAL_SOCKET_SECRET=0P3N-S0URC3 
 export GA_TRACKER=YOUR_GA_TRACKER
-$GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal.it/reveal-pod.json
+$GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal/reveal-pod.json
 ```
 
 To build and deploy your own Docker image for Gist-Reveal.It on OpenShiftM5, use the file `k8s/reveal-dockerbuild.json` as follows.
 
 - Make sure OpenShift is running with a local Docker registry, and obtain the IP address of the registry with a command such as `osc get services`. It will likely have the form 172.30.17.x.
 - Update `k8s/reveal-dockerbuild.json`, replacing all references to `172.30.17.x` with the IP of your local Docker registry.
-- If you have forked this repository and wish to build from your copy, update `https://github.com/ryanj/gist-reveal.it.git` in `reveal-dockerbuild.json` to point to your fork.
+- If you have forked this repository and wish to build from your copy, update `https://github.com/ryanj/gist-reveal.git` in `reveal-dockerbuild.json` to point to your fork.
 - Run a command such as the following to process and apply the configuration. Include values for any config parameters you wish to set/override:
 
 ```

@@ -135,12 +135,28 @@
                                 },
                                 "env": [
                                     {
-                                        "name": "GISTREVEAL_SIZE",
-                                        "value": "${GISTREVEAL_SIZE}"
+                                        "name": "DEFAULT_GIST",
+                                        "value": "${DEFAULT_GIST}"
                                     },
                                     {
-                                        "name": "ACCESS_TOKEN",
-                                        "value": "${ACCESS_TOKEN}"
+                                        "name": "GH_CLIENT_ID",
+                                        "value": "${GH_CLIENT_ID}"
+                                    },
+                                    {
+                                        "name": "GH_CLIENT_SECRET",
+                                        "value": "${GH_CLIENT_SECRET}"
+                                    },
+                                    {
+                                        "name": "REVEAL_THEME",
+                                        "value": "${REVEAL_THEME}"
+                                    },
+                                    {
+                                        "name": "REVEAL_WEB_HOST",
+                                        "value": "${REVEAL_WEB_HOST}"
+                                    },
+                                    {
+                                        "name": "REVEAL_SOCKET_SECRET",
+                                        "value": "${REVEAL_SOCKET_SECRET}"
                                     }
                                 ],
                                 "ports": [
@@ -209,19 +225,40 @@
     ],
     "parameters": [
         {
-            "description": "OpenShift OAuth token (REQUIRED)",
-            "value": "Missing!",
-            "name": "ACCESS_TOKEN"
+            "description": "GitHub Client Secret (REQUIRED)",
+            "value": "",
+            "name": "GH_CLIENT_SECRET"
+        },
+        {
+            "description": "GitHub Client ID (REQUIRED)",
+            "value": "",
+            "name": "GH_CLIENT_ID
+        },
+        {
+            "description": "Default Gist content for the base path",
+            "value": "af84d40e58c5c2a908dd",
+            "name": "DEFAULT_GIST"
+        },
+        {
+            "description": "Default Reveal.js theme",
+            "value": "af84d40e58c5c2a908dd",
+            "name": "REVEAL_THEME"
+        },
+        {
+            "description": "public hostname",
+            "value": "localhost",
+            "name": "REVEAL_WEB_HOST"
+        },
+        {
+            "description": "Websocket Broadcast secret",
+            "from": "[a-zA-Z0-9]{8}",
+            "generate": "expression",
+            "name": "REVEAL_SOCKET_SECRET"
         },
         {
             "description": "builder image",
             "value": "openshift/nodejs-010-centos7",
             "name": "BUILDER_IMAGE"
-        },
-        {
-            "description": "The total number of hexagons (containers) to display in the UI",
-            "value": "small",
-            "name": "GISTREVEAL_SIZE"
         },
         {
             "description": "Generic webhook secret",

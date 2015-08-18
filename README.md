@@ -1,5 +1,5 @@
 # Gist-Reveal
-[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.svg)](https://travis-ci.org/ryanj/gist-reveal) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.svg)](https://david-dm.org/ryanj/gist-reveal.it) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
+[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.svg)](https://travis-ci.org/ryanj/gist-reveal) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.svg)](https://david-dm.org/ryanj/gist-reveal) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
 
 [![Launch on OpenShift](http://launch-shifter.rhcloud.com/launch/LAUNCH ON.svg)](https://openshift.redhat.com/app/console/application_type/custom?&cartridges[]=nodejs-0.10&initial_git_url=https://github.com/ryanj/gist-reveal.git&name=slides)
 

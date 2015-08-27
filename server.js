@@ -248,6 +248,11 @@ var getClientConfig = function(){
   return "hosted:{ id: '"+tokens.socket_id+"', url: '"+opts.socket_host+"'}";
 };
 app.get("/", get_slides);
+app.get("/status", function(req,res,next) {
+  res.send('ok');
+  return next();
+});
+
 app.use(ecstatic({ root: __dirname, showDir: false, handleError: false }));
 app.get("/:gist_id", get_slides);
 

@@ -232,7 +232,7 @@
         {
             "description": "GitHub Client ID (REQUIRED)",
             "value": "",
-            "name": "GH_CLIENT_ID
+            "name": "GH_CLIENT_ID"
         },
         {
             "description": "Default Gist content for the base path",

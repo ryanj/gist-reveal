@@ -173,8 +173,8 @@ var get_gist = function(gist_id, cb) {
   var gist_api_url = "https://api.github.com/gists/";
   // hits rate limits quickly when auth is omitted
   var authentication = ""; 
-  if( typeof(config.get('GH_CLIENT_SECRET')) !== "undefined" && config.get('GH_CLIENT_SECRET') !== ""
-      typeof(config.get('GH_CLIENT_ID'))     !== "undefined" && config.get('GH_CLIENT_ID') !== "" ){
+  if( typeof config.get('GH_CLIENT_SECRET') !== "undefined" && config.get('GH_CLIENT_SECRET') !== "" &&
+      typeof config.get('GH_CLIENT_ID')     !== "undefined" && config.get('GH_CLIENT_ID') !== "" ){
     authentication = "?client_id="+config.get('GH_CLIENT_ID')+"&client_secret="+config.get('GH_CLIENT_SECRET');
   }
   request({

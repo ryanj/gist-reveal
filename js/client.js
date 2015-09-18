@@ -1,6 +1,6 @@
 (function() {
     var hosted = Reveal.getConfig().hosted;
-    var socket = io.connect(hosted.url);
+    var socket = io.connect(document.location.protocol+'//'+document.location.host);
     var socketId = hosted.id;
 
     //Persist presenter token when supplied via hash:

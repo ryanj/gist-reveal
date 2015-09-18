@@ -10,7 +10,7 @@ Just store any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#m
 Conference organizers can host their own modified gist-reveal templating service to provide a consistent slideshow theme for all of the presentations at their event:
 
  * [gist-reveal.it](http://gist-reveal.it/af84d40e58c5c2a908dd)
- * [dockercon-slides.com](http://dockercon-slides.com/af84d40e58c5c2a908dd)
+ * [gist-reveal.it w/ a custom theme](http://gist-reveal.it/af84d40e58c5c2a908dd)
 
 ### Application Config
 
@@ -26,7 +26,6 @@ PORT | The server port number | 8080
 IP_ADDR | The server IP address | 0.0.0.0
 REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | 60e54843de11a545897e
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically "url/?theme=gist_id". Disable this feature by setting this config to the string "false". | "true"
-REVEAL_WEB_HOST | The site's hostname | localhost
 REVEAL_SOCKET_SECRET | the site's broadcast token (alphanumeric) | randomly generated
 
 See [`plugin/hosted/index.js`](https://github.com/ryanj/gist-reveal.it/edit/master/plugin/hosted/index.js) for more information about the site's configuration options.
@@ -43,20 +42,68 @@ This token will be stored in the browser's `localStorage` area (per host url) as
 
     http://YOUR_REVEAL_HOST_URL/?clearToken
 
+## Running Gist-Reveal.it
+There are many ways to run Gist-Reveal slideshow templating service.  This application should run on OpenShiftV2, OpenShiftV3, Docker, Kubernetes, Heroku, and more.
+
 ### Local Development
 
-Start this project locally by running `npm install` followed by `npm start`.
+The simplest way to get started with this project, is to clone a copy of the source from github, and run the app locally with `npm install` followed by `npm start`.
 
-## OpenShift Hosting
+## Docker 
 
-This application can be launched on any OpenShift cloud using the `rhc` command-line tool:
+To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
+
+```bash
+docker pull ryanj/gist-reveal
+docker run -d -p 8080:8080 ryanj/gist-reveal
+```
+
+[Environment variables](#Application_Config) can be passed into the Docker container in order to configure the websocket relay, or to change the default slideshow content: 
+
+```bash
+docker run -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
+```
+
+### OpenShiftV3
+
+Build from GitHub, using Source2Image:
+
+```bash
+oc process -v REVEAL_SOCKET_SECRET=1234 -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-github.json | oc create -f -
+```
+
+Deploy a pre-built image from DockerHub:
+
+```bash
+oc process -v REVEAL_SOCKET_SECRET=1234 -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-dockerhub.json | oc create -f -
+```
+
+Or, install one or both of the templates to make these projects easier to launch (from the web, or via `oc new-app templatename`):
+
+```bash
+oc create -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-dockerhub.json
+oc create -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-github.json
+oc process gistreveal -v DEFAULT_GIST=${DEFAULT_GIST},GH_CLIENT_ID=${GH_CLIENT_ID},GH_CLIENT_SECRET=${GH_CLIENT_SECRET},REVEAL_SOCKET_SECRET=${REVEAL_SOCKET_SECRET} | oc create -f -
+```
+
+If you are building from GitHub, using S2I, you should be able to trigger a build with the following command:
+
+```
+oc start-build gistreveal
+```
+
+To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `oc build-logs`. For example: `oc build-logs gistreveal-1`.
+
+### OpenShift.com
+
+This application will also run on any OpenShiftV2 cloud using the `rhc` command-line tool:
 
 ```bash
 rhc app create gistreveal nodejs-0.10 \
 --from-code=http://github.com/ryanj/gist-reveal \ 
-DEFAULT_GIST=YOUR_DEFAULT_GIST_ID \ 
-GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET \ 
-GH_CLIENT_ID=YOUR_GH_CLIENT_ID \ 
+DEFAULT_GIST=${DEFAULT_GIST} \ 
+GH_CLIENT_SECRET=${GH_CLIENT_SECRET} \ 
+GH_CLIENT_ID=${GH_CLIENT_ID} \ 
 REVEAL_SOCKET_SECRET=0P3N-S0URC3 \ 
 GA_TRACKER=YOUR_GA_TRACKER
 ```
@@ -65,51 +112,19 @@ Or, [click here to launch on the web](https://openshift.redhat.com/app/console/a
 
 Then, use the `rhc env set` command to publish [configuration strings](#application-config) into the application's system environment.
 
-## Docker 
-
-To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
-
-    docker pull ryanj/gist-reveal
-    docker run -d -p 8080:8080 ryanj/gist-reveal
-
-[Environment variables](#Application_Config) can be passed into the Docker container in order to configure the websocket relay, or to change the default slideshow content: 
-
-    docker run -e "REVEAL_WEB_HOST=YOUR_HOSTNAME_HERE" -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
     
-### OpenShiftM5 & Kubernetes 
+### Kubernetes 
 
 A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-reveal/blob/master/reveal-pod.json) is included for running [this project's Docker build](https://registry.hub.docker.com/u/ryanj/gist-reveal/) on [an OriginM5 hosting environment](https://github.com/openshift/origin#getting-started):
 
 ```bash
 export DEFAULT_GIST=YOUR_DEFAULT_GIST_ID 
-export IP_ADDR=0.0.0.0
-export OPENSHIFT_APP_DNS=gist-reveal.it
 export GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET 
 export GH_CLIENT_ID=YOUR_GH_CLIENT_ID
 export REVEAL_SOCKET_SECRET=0P3N-S0URC3 
 export GA_TRACKER=YOUR_GA_TRACKER
-$GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kube create pods -c ~/src/gist-reveal/reveal-pod.json
+$GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kubectl create pods -c k8s/reveal-pod.json
 ```
-
-To build and deploy your own Docker image for Gist-Reveal.It on OpenShiftM5, use the file `k8s/reveal-dockerbuild.json` as follows.
-
-- Make sure OpenShift is running with a local Docker registry, and obtain the IP address of the registry with a command such as `osc get services`. It will likely have the form 172.30.17.x.
-- Update `k8s/reveal-dockerbuild.json`, replacing all references to `172.30.17.x` with the IP of your local Docker registry.
-- If you have forked this repository and wish to build from your copy, update `https://github.com/ryanj/gist-reveal.git` in `reveal-dockerbuild.json` to point to your fork.
-- Run a command such as the following to process and apply the configuration. Include values for any config parameters you wish to set/override:
-
-```
-osc process -f reveal-stibuild.json -v DEFAULT_GIST=${DEFAULT_GIST},GH_CLIENT_ID=${GH_CLIENT_ID},GH_CLIENT_SECRET=${GH_CLIENT_SECRET},REVEAL_SOCKET_SECRET=${REVEAL_SOCKET_SECRET} | osc apply -f -
-```
-
-- Run the following command to trigger a build.
-
-```
-curl -X POST http://localhost:8080/osapi/v1beta1/buildConfigHooks/gist-reveal-build/secret101/generic
-```
-
-- To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `osc build-logs`. For example: `osc build-logs 4af7a5cd-8b21-11e4-85b4-853a4bcdbfe0`.
-- When the build is complete, you should be able to view Gist-Reveal.It in your browser at the IP address found in the output of `osc get services`.
 
 ## License
 

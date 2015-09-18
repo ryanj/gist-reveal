@@ -2,6 +2,7 @@ var express		= require('reveal.js/node_modules/express');
 var fs			= require('fs');
 var io			= require('reveal.js/node_modules/socket.io');
 var crypto		= require('crypto');
+var cc                  = require('config-multipaas');
 var app			= express.createServer();
 var ecstatic            = require('ecstatic');
 var io			= io.listen(app);
@@ -9,9 +10,13 @@ var path    = require('path');
 var request = require('request');
 var sanitizeHtml = require('sanitize-html');
 var mkdirp  = require('mkdirp');
+var rate_limit_slides = require('./rate_limit_response.json');
+var default_slides = require('./default_response.json');
+var error_slides = require('./error_response.json');
+var slideshow_template = fs.readFileSync( __dirname + '/index.html');
 var sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span']),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div']),
     allowedAttributes: {
       'h1': ['class','style'],
       'h2': ['class','style'],
@@ -39,42 +44,30 @@ var sanitize = function(slideshow_content){
       'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background']
     }
 })}
-
-var opts = {
-  port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-  ipAddr : process.env.IP_ADDR || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-  web_host: process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080',
-  socket_host: process.env.REVEAL_SOCKET_HOST || process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost',
-  socket_secret : process.env.REVEAL_SOCKET_SECRET,
-  default_gist_id : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd',
-  theme : process.env.REVEAL_THEME || '60e54843de11a545897e',
-  install_gist_themes : process.env.GIST_THEMES || "true",
-  template_logo_text : process.env.TEMPLATE_LOGO_TEXT || "Launch on OpenShift",
-  template_logo_img : process.env.TEMPLATE_LOGO_IMG || "img/launchbutton.svg",
-  template_logo_url : process.env.TEMPLATE_LOGO_URL || "https://openshift.redhat.com/app/console/application_types/custom?name=slides&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.it.git&cartridges[]=nodejs-0.10",
-  ga_tracker_key : process.env.GA_TRACKER,
-  gh_client_secret : process.env.GH_CLIENT_SECRET,
-  gh_client_id : process.env.GH_CLIENT_ID,
-  baseDir : __dirname 
-};
-var rate_limit_slides = require('./rate_limit_response.json');
-var default_slides = require('./default_response.json');
-var error_slides = require('./error_response.json');
-var slideshow_template = fs.readFileSync(opts.baseDir + '/index.html');
-
-
+var config = cc({
+  REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
+, DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
+, REVEAL_THEME : process.env.REVEAL_THEME || '60e54843de11a545897e'
+, GIST_THEMES : process.env.GIST_THEMES || "true"
+, GH_CLIENT_ID : process.env.GH_CLIENT_ID
+, GH_CLIENT_SECRET : process.env.GH_CLIENT_SECRET
+, GA_TRACKER : process.env.GA_TRACKER
+, REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
+, TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Launch on OpenShift"
+, TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "img/launchbutton.svg"
+, TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://openshift.redhat.com/app/console/application_types/custom?name=slides&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.git&cartridges[]=nodejs-0.10"
+});
 var createHash = function(secret) {
 	var cipher = crypto.createCipher('blowfish', secret);
 	return(cipher.final('hex'));
 };
-
-var ga_tracker_html = function(tracker_id, hostname){
+var ga_tracker_html = function(tracker_id){
   if(typeof(tracker_id) !== 'undefined'){
     return "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" + 
     "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n" + 
     "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n" + 
     "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n" + 
-    "ga('create', '"+tracker_id+"', '"+hostname+"');\n" + 
+    "ga('create', '"+tracker_id+"', 'auto');\n" + 
     "ga('send', 'pageview');</script>";
   }else{
     return "";
@@ -96,12 +89,11 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)
-                           .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(opts.ga_tracker_key, opts.web_host))
-                           .replace(/\{\{hostname}}/, opts.web_host)
+                           .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(config.get('GA_TRACKER')))
                            .replace(/\{\{theme}}/, themename)
-                           .replace(/\{\{template_logo_url}}/, opts.template_logo_url)
-                           .replace(/\{\{template_logo_text}}/, opts.template_logo_text)
-                           .replace(/\{\{template_logo_img}}/, opts.template_logo_img)
+                           .replace(/\{\{template_logo_url}}/, config.get('TEMPLATE_LOGO_URL'))
+                           .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
+                           .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
     )
@@ -130,7 +122,7 @@ var install_theme = function(gist){
 }
 
 var get_theme = function(gist_id, cb) {
-  if( opts.install_gist_themes == 'false' ){
+  if( !config.get('GIST_THEMES') ){
     // if theme installation is disabled, return immediately
     cb(gist_id)
   }
@@ -160,8 +152,8 @@ var get_theme = function(gist_id, cb) {
 }
 
 var get_slides = function(req, res, next) {
-  var gist_id = req.param('gist_id', opts.default_gist_id);
-  var theme = req.param('theme', opts.theme);
+  var gist_id = req.param('gist_id', config.get('DEFAULT_GIST'));
+  var theme = req.param('theme', config.get('REVEAL_THEME'));
   get_gist(gist_id, function (error, response, api_response) {
     if (!error && response.statusCode == 200) {
       gist = JSON.parse(api_response);
@@ -181,9 +173,9 @@ var get_gist = function(gist_id, cb) {
   var gist_api_url = "https://api.github.com/gists/";
   // hits rate limits quickly when auth is omitted
   var authentication = ""; 
-  if( typeof(opts.gh_client_secret) !== "undefined" && 
-      typeof(opts.gh_client_id)     !== "undefined" ){
-    authentication = "?client_id="+opts.gh_client_id+"&client_secret="+opts.gh_client_secret;
+  if( typeof(config.get('GH_CLIENT_SECRET')) !== "undefined" && config.get('GH_CLIENT_SECRET') !== ""
+      typeof(config.get('GH_CLIENT_ID'))     !== "undefined" && config.get('GH_CLIENT_ID') !== "" ){
+    authentication = "?client_id="+config.get('GH_CLIENT_ID')+"&client_secret="+config.get('GH_CLIENT_SECRET');
   }
   request({
     url: gist_api_url + gist_id + authentication, 
@@ -212,40 +204,16 @@ io.sockets.on('connection', function(socket) {
   socket.on('navigation', checkAndReflect);
 });
 
-var printTokenUsageInfo = function(token){
-  var hostnm = opts.web_host;
-  if(!process.env.OPENSHIFT_APP_NAME){
-    //Printing generic hosted / local host info:
-    console.log("Set your broadcast token as an environment variable and restart your server:");
-    console.log("  export REVEAL_SOCKET_SECRET='"+token.socket_secret+"'");
-    console.log("  npm start");
-    console.log("Then, configure your browser as a presentation device by loading the following URL:");
-    console.log("  http://" + hostnm + "/?setToken=" + token.socket_secret);
-  }else{
-    var appnm = process.env.OPENSHIFT_APP_NAME;
-
-    //Printing OpenShift-specific usage info:
-    console.log("Tell OpenShift to save this broadcast token and publish it as an environment variable:");
-    console.log("  rhc env set REVEAL_SOCKET_SECRET="+token.socket_secret+" -a " + appnm);
-    console.log("  rhc app restart " + appnm);
-    console.log("Then, configure your browser as a presentation device by loading the following URL: ");
-    console.log("  http://" + hostnm + "/?setToken=" + token.socket_secret);
-  }
-}
-
 var getTokens = function(){
-	var ts = new Date().getTime();
-	var rand = Math.floor(Math.random()*9999999);
-	var secret = opts.socket_secret || ts.toString() + rand.toString();
-	var socket = createHash(secret);
+  var secret = config.get('REVEAL_SOCKET_SECRET');
+  var socket = createHash(secret);
   response = {"socket_secret": secret, "socket_id": socket};
-  printTokenUsageInfo(response);
   return response;
 };
 
 var getClientConfig = function(){
   var tokens = getTokens();
-  return "hosted:{ id: '"+tokens.socket_id+"', url: '"+opts.socket_host+"'}";
+  return "hosted:{ id: '"+tokens.socket_id+"' }";
 };
 app.get("/", get_slides);
 app.get("/status", function(req,res,next) {
@@ -257,8 +225,8 @@ app.use(ecstatic({ root: __dirname, showDir: false, handleError: false }));
 app.get("/:gist_id", get_slides);
 
 // Actually listen
-app.listen(opts.port, opts.ipAddr, function(){
-  get_theme(opts.theme, function(){
+app.listen(config.get('PORT'), config.get('IP'), function(){
+  get_theme(config.get('REVEAL_THEME'), function(){
     //if the default theme is a gist_id, prime the cache 
   })
 });
@@ -267,4 +235,4 @@ var brown = '\033[33m',
 	green = '\033[32m',
 	reset = '\033[0m';
 
-console.log( brown + "reveal.js:" + reset + " Multiplex running on port " + green + opts.port + reset );
+console.log( brown + "reveal.js:" + reset + " Multiplex running on port " + green + config.get('PORT') + reset );

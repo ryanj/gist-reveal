@@ -1,11 +1,12 @@
 var express		= require('reveal.js/node_modules/express');
 var fs			= require('fs');
-var io			= require('reveal.js/node_modules/socket.io');
 var crypto		= require('crypto');
 var cc                  = require('config-multipaas');
-var app			= express.createServer();
+var app = express()
+  , http = require('http')
+  , server = http.createServer(app)
+  , io = require('reveal.js/node_modules/socket.io').listen(server);
 var ecstatic            = require('ecstatic');
-var io			= io.listen(app);
 var path    = require('path');
 var request = require('request');
 var sanitizeHtml = require('sanitize-html');
@@ -225,7 +226,7 @@ app.use(ecstatic({ root: __dirname, showDir: false, handleError: false }));
 app.get("/:gist_id", get_slides);
 
 // Actually listen
-app.listen(config.get('PORT'), config.get('IP'), function(){
+server.listen(config.get('PORT'), config.get('IP'), function(){
   get_theme(config.get('REVEAL_THEME'), function(){
     //if the default theme is a gist_id, prime the cache 
   })

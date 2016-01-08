@@ -22,10 +22,12 @@
   "dependencies": {
     "config-multipaas": "^0.1.0",
     "ecstatic": "^1.4.0",
+    "express": "^4.13.3",
     "mkdirp": "^0.5.1",
     "request": "^2.60.0",
     "reveal.js": "^3.1.0",
-    "sanitize-html": "^1.8.0"
+    "sanitize-html": "^1.8.0",
+    "socket.io": "^1.4.2"
   },
   "licenses": [
     {

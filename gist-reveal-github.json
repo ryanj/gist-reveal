@@ -2,10 +2,10 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-        "name": "gistreveal",
+        "name": "gist-reveal",
         "creationTimestamp": null,
         "annotations": {
-            "name": "gistreveal",
+            "name": "gist-reveal",
             "description": "Gist-powered Reveal.js slides (GitHub S2I)",
             "provider": "ryanj",
             "iconClass": "icon-nodejs",
@@ -14,24 +14,32 @@
     },
     "parameters": [
         {
+            "name": "WEB_SERVICE_NAME",
+            "description": "Web service name",
+            "value": "gistreveal",
+            "required": true
+        },
+        {
             "description": "GitHub Client Secret (REQUIRED)",
-            "value": "",
-            "name": "GH_CLIENT_SECRET"
+            "name": "GH_CLIENT_SECRET",
+	    "required": true
         },
         {
             "description": "GitHub Client ID (REQUIRED)",
-            "value": "",
-            "name": "GH_CLIENT_ID"
+            "name": "GH_CLIENT_ID",
+	    "required": true
         },
         {
             "description": "Default Gist content for the base path",
             "value": "af84d40e58c5c2a908dd",
-            "name": "DEFAULT_GIST"
+            "name": "DEFAULT_GIST",
+	    "required": true
         },
         {
             "description": "Default Reveal.js theme",
             "value": "60e54843de11a545897e",
-            "name": "REVEAL_THEME"
+            "name": "REVEAL_THEME",
+	    "required": true
         },
         {
             "description": "Websocket Broadcast secret",
@@ -41,8 +49,9 @@
         },
         {
             "description": "builder image",
-            "value": "openshift/nodejs-010-centos7",
-            "name": "BUILDER_IMAGE"
+            "value": "nodejs:latest",
+            "name": "BUILDER_IMAGE",
+	    "required": true
         },
         {
             "description": "Generic webhook secret",
@@ -62,7 +71,7 @@
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gistreveal",
+                "name": "${WEB_SERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
                     "from": "github"
@@ -77,7 +86,7 @@
             "kind": "BuildConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gistreveal",
+                "name": "${WEB_SERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
                     "from": "github"
@@ -112,16 +121,16 @@
                     "type": "Source",
                     "sourceStrategy": {
                         "from": {
-                            "kind": "DockerImage",
-                            "name": "${BUILDER_IMAGE}:latest"
-                        },
-                        "incremental": true
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "${BUILDER_IMAGE}"
+                        }
                     }
                 },
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
-                        "name": "gistreveal:latest"
+                        "name": "${WEB_SERVICE_NAME}:latest"
                     }
                 },
                 "resources": {}
@@ -134,7 +143,7 @@
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gistreveal",
+                "name": "${WEB_SERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": { 
                     "from": "github"
@@ -153,35 +162,41 @@
                         "imageChangeParams": {
                             "automatic": true,
                             "containerNames": [
-                                "gistreveal"
+                                "${WEB_SERVICE_NAME}"
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
-                                "name": "gistreveal:latest"
+                                "name": "${WEB_SERVICE_NAME}:latest"
                             }
                         }
                     }
                 ],
                 "replicas": 1,
                 "selector": {
-                    "deploymentconfig": "gistreveal"
+                    "deploymentconfig": "${WEB_SERVICE_NAME}"
                 },
                 "template": {
                     "metadata": {
                         "creationTimestamp": null,
                         "labels": {
-                            "deploymentconfig": "gistreveal",
+                            "deploymentconfig": "${WEB_SERVICE_NAME}",
                             "from": "github"
                         }
                     },
                     "spec": {
+                        "volumes": [
+                            {
+                                "name": "${WEB_SERVICE_NAME}-volume-1",
+                                "emptyDir": {}
+                            }
+                        ],
                         "containers": [
                             {
-                                "name": "gistreveal",
-                                "image": "gistreveal:latest",
+                                "name": "${WEB_SERVICE_NAME}",
+                                "image": "${WEB_SERVICE_NAME}:latest",
                                 "ports": [
                                     {
-                                        "name": "gistrevealtcp",
+                                        "name": "${WEB_SERVICE_NAME}-tcp",
                                         "containerPort": 8080,
                                         "protocol": "TCP"
                                     }
@@ -217,6 +232,12 @@
                                     }
                                 ],
                                 "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "${WEB_SERVICE_NAME}-volume-1",
+                                        "mountPath": "/run"
+                                    }
+                                ],
                                 "terminationMessagePath": "/dev/termination-log",
                                 "imagePullPolicy": "Always",
                                 "securityContext": {
@@ -236,7 +257,7 @@
             "kind": "Service",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gistreveal",
+                "name": "${WEB_SERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
                     "from": "github"
@@ -245,7 +266,7 @@
             "spec": {
                 "ports": [
                     {
-                        "name": "gistrevealtcp",
+                        "name": "${WEB_SERVICE_NAME}-tcp",
                         "protocol": "TCP",
                         "port": 8080,
                         "targetPort": 8080,
@@ -253,7 +274,7 @@
                     }
                 ],
                 "selector": {
-                    "deploymentconfig": "gistreveal"
+                    "deploymentconfig": "${WEB_SERVICE_NAME}"
                 },
                 "portalIP": "",
                 "type": "ClusterIP"
@@ -263,7 +284,7 @@
             "kind": "Route",
             "apiVersion": "v1",
             "metadata": {
-                "name": "gistreveal",
+                "name": "${WEB_SERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
                     "from": "github"
@@ -273,7 +294,7 @@
                 "host": "",
                 "to": {
                     "kind": "Service",
-                    "name": "gistreveal"
+                    "name": "${WEB_SERVICE_NAME}"
                 }
             },
             "status": {}

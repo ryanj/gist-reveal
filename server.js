@@ -1,11 +1,11 @@
-var express		= require('reveal.js/node_modules/express');
+var express		= require('express');
 var fs			= require('fs');
 var crypto		= require('crypto');
 var cc                  = require('config-multipaas');
 var app = express()
   , http = require('http')
   , server = http.createServer(app)
-  , io = require('reveal.js/node_modules/socket.io').listen(server);
+  , io = require('socket.io').listen(server);
 var ecstatic            = require('ecstatic');
 var path    = require('path');
 var request = require('request');
@@ -218,11 +218,10 @@ var getClientConfig = function(){
 };
 app.get("/", get_slides);
 app.get("/status", function(req,res,next) {
-  res.send('ok');
-  return next();
+  return res.send('ok');
 });
 
-app.use(ecstatic({ root: __dirname, showDir: false, handleError: false }));
+app.use(ecstatic({ root: __dirname, showDir: false, handleError: true }));
 app.get("/:gist_id", get_slides);
 
 // Actually listen

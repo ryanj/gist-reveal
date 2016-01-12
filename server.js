@@ -6,7 +6,7 @@ var app = express()
   , http = require('http')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
-var ecstatic            = require('ecstatic');
+var st      = require('st');
 var path    = require('path');
 var request = require('request');
 var sanitizeHtml = require('sanitize-html');
@@ -221,7 +221,13 @@ app.get("/status", function(req,res,next) {
   return res.send('ok');
 });
 
-app.use(ecstatic({ root: __dirname, showDir: false, handleError: true }));
+// Static files:
+app.use(st({
+  path: __dirname,
+  passthrough: true
+}))
+
+// Gist templates:
 app.get("/:gist_id", get_slides);
 
 // Actually listen

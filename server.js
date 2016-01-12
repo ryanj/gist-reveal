@@ -117,7 +117,9 @@ var install_theme = function(gist){
       });
     }else{
       filename = path.resolve('css','theme',gist.id,filenm)
-      request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename))
+      request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', function(err) {
+          console.log(err)
+      })
     }
   }
 }
@@ -153,8 +155,8 @@ var get_theme = function(gist_id, cb) {
 }
 
 var get_slides = function(req, res, next) {
-  var gist_id = req.param('gist_id', config.get('DEFAULT_GIST'));
-  var theme = req.param('theme', config.get('REVEAL_THEME'));
+  var gist_id = req.query['gist_id'] || config.get('DEFAULT_GIST');
+  var theme = req.query['theme'] || config.get('REVEAL_THEME');
   get_gist(gist_id, function (error, response, api_response) {
     if (!error && response.statusCode == 200) {
       gist = JSON.parse(api_response);

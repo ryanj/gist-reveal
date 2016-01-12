@@ -6,7 +6,6 @@ var app = express()
   , http = require('http')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
-var st      = require('st');
 var path    = require('path');
 var request = require('request');
 var sanitizeHtml = require('sanitize-html');
@@ -155,7 +154,7 @@ var get_theme = function(gist_id, cb) {
 }
 
 var get_slides = function(req, res, next) {
-  var gist_id = req.query['gist_id'] || config.get('DEFAULT_GIST');
+  var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
   var theme = req.query['theme'] || config.get('REVEAL_THEME');
   get_gist(gist_id, function (error, response, api_response) {
     if (!error && response.statusCode == 200) {
@@ -224,10 +223,7 @@ app.get("/status", function(req,res,next) {
 });
 
 // Static files:
-app.use(st({
-  path: __dirname,
-  passthrough: true
-}))
+app.use(express.static(__dirname))
 
 // Gist templates:
 app.get("/:gist_id", get_slides);

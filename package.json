@@ -20,7 +20,7 @@
     "node": "~0.10.0"
   },
   "dependencies": {
-    "config-multipaas": "^0.1.0",
+    "config-multipaas": "^0.2.1",
     "express": "^4.13.3",
     "mkdirp": "^0.5.1",
     "request": "^2.60.0",

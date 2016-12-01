@@ -56,6 +56,9 @@ var config = cc({
 , TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Runs on Kubernetes"
 , TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "img/runsonk8s.svg"
 , TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://github.com/ryanj/gist-reveal#running-gist-revealit"
+, TEMPLATE_GIST_TEXT : process.env.TEMPLATE_GIST_TEXT || "Presentation Source"
+, TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "img/presentation_source.svg"
+, TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
 var createHash = function(secret) {
 	var cipher = crypto.createCipher('blowfish', secret);
@@ -94,6 +97,9 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{template_logo_url}}/, config.get('TEMPLATE_LOGO_URL'))
                            .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
                            .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
+                           .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist.id)
+                           .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT'))
+                           .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG'))
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
     )

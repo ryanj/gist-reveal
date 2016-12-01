@@ -15,13 +15,24 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
     <style id='site_logo_css' type='text/css'>
-      .reveal #site-logo {
+      .reveal #logo-link {
         position:   fixed;
         z-index:    30;
         bottom:     10px;
         left:       10px;
         padding:    0.25%;
         max-width:  130px;
+        outline:    none;
+        box-shadow: none;
+        background: transparent;
+      }
+      .reveal #gist-link {
+        position:   fixed;
+        z-index:    30;
+        bottom:     10px;
+        left:       150px;
+        padding:    0.25%;
+        max-width:  100px;
         outline:    none;
         box-shadow: none;
         background: transparent;
@@ -61,7 +72,8 @@
 			<div class="slides">
       {{slides}}
       </div>
-      <a id='logo-link' href="{{template_logo_url}}"><img id="site-logo" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
+      <a id='logo-link' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
+      <a id='gist-link' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
 
 		</div>
 

@@ -24,7 +24,7 @@ GH_CLIENT_ID | GitHub client ID | unset
 GA_TRACKER | Google Analytics tracker token | unset
 PORT | The server port number | 8080
 IP_ADDR | The server IP address | 0.0.0.0
-REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | 60e54843de11a545897e
+REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | 450836bbaebcf4c4ae08b331343a7886 
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically "url/?theme=gist_id". Disable this feature by setting this config to the string "false". | "true"
 REVEAL_SOCKET_SECRET | the site's broadcast token (alphanumeric) | randomly generated
 

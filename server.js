@@ -47,7 +47,7 @@ var sanitize = function(slideshow_content){
 var config = cc({
   REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
-, REVEAL_THEME : process.env.REVEAL_THEME || '60e54843de11a545897e'
+, REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
 , GIST_THEMES : process.env.GIST_THEMES || "true"
 , GH_CLIENT_ID : process.env.GH_CLIENT_ID
 , GH_CLIENT_SECRET : process.env.GH_CLIENT_SECRET

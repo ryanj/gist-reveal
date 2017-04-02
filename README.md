@@ -47,9 +47,25 @@ There are many ways to run Gist-Reveal slideshow templating service.  This appli
 
 ### Local Development
 
-The simplest way to get started with this project, is to clone a copy of the source from github, and run the app locally with `npm install` followed by `npm start`.
+The simplest way to get started with this project, is to clone a copy of the source from github (`git clone http://github.com/ryanj/gist-reveal && cd gist-reveal`), then run the app locally with `npm install` followed by `npm start`.
 
-## Docker 
+### Kubernetes 
+To create a kubernetes deployment and `NodePort` service, both named `gist-reveal`:
+
+```bash
+kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 --service-overrides='{ "spec": { "type": "NodePort" } }' \
+--env="DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" \
+--env="GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET" \
+--env="GH_CLIENT_ID=YOUR_GH_CLIENT_ID" \
+--env="REVEAL_SOCKET_SECRET=0P3N-S0URC3" \
+--env="GA_TRACKER=YOUR_GA_TRACKER"
+```
+
+Minikube users should be able to open the new service in their browser by running:
+
+    minikube service gist-reveal
+
+### Docker 
 
 To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
 
@@ -113,19 +129,6 @@ Or, [click here to launch on the web](https://openshift.redhat.com/app/console/a
 Then, use the `rhc env set` command to publish [configuration strings](#application-config) into the application's system environment.
 
     
-### Kubernetes 
-
-A [sample kubernetes pod configuration file](https://github.com/ryanj/gist-reveal/blob/master/reveal-pod.json) is included for running [this project's Docker build](https://registry.hub.docker.com/u/ryanj/gist-reveal/) on [an OriginM5 hosting environment](https://github.com/openshift/origin#getting-started):
-
-```bash
-export DEFAULT_GIST=YOUR_DEFAULT_GIST_ID 
-export GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET 
-export GH_CLIENT_ID=YOUR_GH_CLIENT_ID
-export REVEAL_SOCKET_SECRET=0P3N-S0URC3 
-export GA_TRACKER=YOUR_GA_TRACKER
-$GOPATH/src/github.com/openshift/origin/_output/go/bin/openshift kubectl create pods -c k8s/reveal-pod.json
-```
-
 ## License
 
 [gist-reveal,it](http://gist-reveal.it/) was created at the first [DockerCon Hackathon](http://blog.docker.com/2014/07/dockercon-video-dockercon-hackathon-winners/) by [@ryanj](https://github.com/ryanj) and [@fkautz](https://github.com/fkautz).

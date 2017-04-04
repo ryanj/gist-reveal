@@ -7,10 +7,14 @@
 
 Just store any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a github gist, then add the resulting gist id to the end of any gist-reveal site url to view the resulting templated presentation.
 
-Conference organizers can host their own modified gist-reveal templating service to provide a consistent slideshow theme for all of the presentations at their event:
+Conference organizers can host their own modified gist-reveal templating service to provide a consistent slideshow theme for all of the presentations at their event.  Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):
 
- * [gist-reveal.it](http://gist-reveal.it/af84d40e58c5c2a908dd)
- * [gist-reveal.it w/ a custom theme](http://gist-reveal.it/af84d40e58c5c2a908dd)
+ * [the black theme](http://gist-reveal.it/?theme=black#/1)
+ * [the white theme](http://gist-reveal.it/?theme=white#/1)
+ * [the league theme](http://gist-reveal.it/?theme=league#/1)
+ * [the sky theme](http://gist-reveal.it/?theme=sky#/1)
+ * [a CoreOS-friendly theme](http://gist-reveal.it/?theme=450836bbaebcf4c4ae08b331343a7886#/1)
+ * [a theme for OpenShift fans](http://gist-reveal.it/?theme=60e54843de11a545897e#/1)
 
 ### Application Config
 

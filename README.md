@@ -3,11 +3,15 @@
 
 [![Launch on OpenShift](http://launch-shifter.rhcloud.com/launch/LAUNCH ON.svg)](https://openshift.redhat.com/app/console/application_type/custom?&cartridges[]=nodejs-0.10&initial_git_url=https://github.com/ryanj/gist-reveal.git&name=slides)
 
+## Gist-powered Revealjs slides
+
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web.
 
 Just store any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a github gist, then add the resulting gist id to the end of any gist-reveal site url to view the resulting templated presentation.
 
-Conference organizers can host their own modified gist-reveal templating service to provide a consistent slideshow theme for all of the presentations at their event.  Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):
+## Gist-powered Slideshow Themes
+
+Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):
 
  * [a CoreOS-friendly theme](http://gist-reveal.it/?theme=450836bbaebcf4c4ae08b331343a7886#/1)
  * [a theme for OpenShift fans](http://gist-reveal.it/?theme=60e54843de11a545897e#/1)
@@ -15,6 +19,8 @@ Conference organizers can host their own modified gist-reveal templating service
  * [the revealjs simple theme](http://gist-reveal.it/?theme=simple#/1)
  * [the revealjs league theme](http://gist-reveal.it/?theme=default#/1)
  * [the revealjs sky theme](http://gist-reveal.it/?theme=sky#/1)
+
+Conference organizers can host their own modified gist-reveal templating service (with it's own default theme), to provide a consistent look for all presentations at an event.
 
 ### Application Config
 

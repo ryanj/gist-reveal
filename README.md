@@ -15,6 +15,8 @@ Example:
 
     http://gist-reveal.it/af84d40e58c5c2a908dd
 
+I usually use [bitly](bit.ly) or another url shortener to make these long urls easier to share (and to make the clicks easier to count)
+
 ## Gist-powered Slideshow Themes
 
 Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):

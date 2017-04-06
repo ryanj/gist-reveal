@@ -7,7 +7,13 @@
 
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web by using github's [gist](http://gist.github.com) service as a datastore.
 
-Save any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a [gist](http://gist.github.com), then [add the resulting gist id to the end of any gist-reveal site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view the resulting templated presentation.
+Save any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a [gist](http://gist.github.com), then [add the resulting gist id to the end of any gist-reveal site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view the resulting templated presentation:
+
+    http://gist-reveal.it/GIST_ID_CONTAINING_REVEALJS_SLIDE_CONTENT
+    
+Example:
+
+    http://gist-reveal.it/af84d40e58c5c2a908dd
 
 ## Gist-powered Slideshow Themes
 
@@ -28,8 +34,8 @@ The following environment variables can be used to autoconfigure the application
 
 Variable Name  | Contents   |  Default Value
 ---------------|------------|---------------
-DEFAULT_GIST   | The default gist id slideshow content for the site | af84d40e58c5c2a908dd
-REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | 450836bbaebcf4c4ae08b331343a7886 
+DEFAULT_GIST   | The default gist id slideshow content for the site | [af84d40e58c5c2a908dd](https://gist.github.com/ryanj/af84d40e58c5c2a908dd)
+REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | [450836bbaebcf4c4ae08b331343a7886](https://gist.github.com/ryanj/450836bbaebcf4c4ae08b331343a7886) 
 GH_CLIENT_SECRET | GitHub client secret | unset
 GH_CLIENT_ID | GitHub client ID | unset
 GA_TRACKER | Google Analytics tracker token | unset

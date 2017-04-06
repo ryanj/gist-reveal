@@ -21,12 +21,12 @@ I usually use [bitly](bit.ly) or another url shortener to make these long urls e
 
 Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):
 
- * [a CoreOS-friendly theme](http://gist-reveal.it/?theme=450836bbaebcf4c4ae08b331343a7886#/1)
- * [a theme for OpenShift fans](http://gist-reveal.it/?theme=60e54843de11a545897e#/1)
- * [the revealjs black theme](http://gist-reveal.it/?theme=black#/1)
- * [the revealjs simple theme](http://gist-reveal.it/?theme=simple#/1)
- * [the revealjs league theme](http://gist-reveal.it/?theme=default#/1)
- * [the revealjs sky theme](http://gist-reveal.it/?theme=sky#/1)
+ * [a theme from the CoreOS team](http://gist-reveal.it/?theme=450836bbaebcf4c4ae08b331343a7886#/themes)
+ * [a theme for OpenShift fans](http://gist-reveal.it/?theme=60e54843de11a545897e#/themes)
+ * [the revealjs black theme](http://gist-reveal.it/?theme=black#/themes)
+ * [the revealjs simple theme](http://gist-reveal.it/?theme=simple#/themes)
+ * [the revealjs league theme](http://gist-reveal.it/?theme=default#/themes)
+ * [the revealjs sky theme](http://gist-reveal.it/?theme=sky#/themes)
 
 Conference organizers can host their own modified gist-reveal templating service (with it's own default theme), to provide a consistent look for all presentations at an event.
 
@@ -61,14 +61,14 @@ This token will be stored in the browser's `localStorage` area (per host url) as
     http://YOUR_REVEAL_HOST_URL/?clearToken
 
 ## Running Gist-Reveal.it
-There are many ways to run Gist-Reveal slideshow templating service.  This application should run on OpenShiftV2, OpenShiftV3, Docker, Kubernetes, Heroku, and more.
+Gist-reveal makes it easy to run your own Gist-powered RevealJS slideshow service
 
 ### Local Development
 
 The simplest way to get started with this project, is to clone a copy of the source from github (`git clone http://github.com/ryanj/gist-reveal && cd gist-reveal`), then run the app locally with `npm install` followed by `npm start`.
 
 ### Kubernetes 
-To create a kubernetes deployment and `NodePort` service, both named `gist-reveal`:
+To create a kubernetes `deployment` and `NodePort` `service`, both named `gist-reveal`:
 
 ```bash
 kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 --service-overrides='{ "spec": { "type": "NodePort" } }' \

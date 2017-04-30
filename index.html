@@ -6,8 +6,10 @@
 
 		<title>{{title}}</title>
 
+		<link rel="icon" type="image/png" href="/img/k8s-favicon.png"/>
 		<meta name="description" content="{{description}}">
 		<meta name="author" content="{{user}}">
+		<meta name="gist_id" content="{{gist_id}}">
 
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -39,13 +41,13 @@
       }
     </style>
 
-		<link rel="stylesheet" href="node_modules/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="/node_modules/reveal.js/css/reveal.css">
                 <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
-                <link rel="stylesheet" href="node_modules/reveal.js/css/theme/black.css" id="theme">
-		<link rel="stylesheet" href="css/theme/{{theme}}.css" id="theme">
+                <link rel="stylesheet" href="/node_modules/reveal.js/css/theme/black.css" id="theme">
+		<link rel="stylesheet" href="/css/theme/{{theme}}.css" id="theme">
 
                 <!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="node_modules/reveal.js/lib/css/zenburn.css">
+		<link rel="stylesheet" href="/node_modules/reveal.js/lib/css/zenburn.css">
 
 		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 		<script>
@@ -53,13 +55,13 @@
 				var link = document.createElement( 'link' );
 				link.rel = 'stylesheet';
 				link.type = 'text/css';
-				link.href = 'css/print/pdf.css';
+				link.href = '/css/print/pdf.css';
 				document.getElementsByTagName( 'head' )[0].appendChild( link );
 			}
 		</script> 
 
 		<!--[if lt IE 9]>
-		<script src="node_modules/reveal.js/lib/js/html5shiv.js"></script>
+		<script src="/node_modules/reveal.js/lib/js/html5shiv.js"></script>
 		<![endif]-->
 
 	</head>
@@ -79,8 +81,8 @@
 
                 //{{ga-tracker}}
 
-		<script src="node_modules/reveal.js/lib/js/head.min.js"></script> 
-		<script src="node_modules/reveal.js/js/reveal.js"></script>
+		<script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
+		<script src="/node_modules/reveal.js/js/reveal.js"></script>
 
 		<script>
 
@@ -102,13 +104,13 @@
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
 					{ src: 'http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js', async: true },
-					{ src: 'js/client.js', async: true },
-					{ src: 'node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-                                        { src: 'node_modules/reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: 'node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: 'node_modules/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					{ src: '/js/client.js', async: true },
+					{ src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                                        { src: '/node_modules/reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '/node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
 

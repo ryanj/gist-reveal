@@ -3,11 +3,13 @@
 
 [![Launch on OpenShift](http://launch-shifter.rhcloud.com/launch/LAUNCH ON.svg)](https://openshift.redhat.com/app/console/application_type/custom?&cartridges[]=nodejs-0.10&initial_git_url=https://github.com/ryanj/gist-reveal.git&name=slides)
 
-## Gist-powered Revealjs slides
+## Gist-powered Revealjs presentations
 
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web by using github's [gist](http://gist.github.com) service as a datastore.
 
-Save any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a [gist](http://gist.github.com), then [add the resulting gist id to the end of any gist-reveal site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view the resulting templated presentation:
+#### gist-reveal.it/YOUR_GIST_ID
+
+Store any Revealjs-compatible [HTML](https://github.com/hakimel/reveal.js#markup) or [Markdown](https://github.com/hakimel/reveal.js#markdown) content in a [gist](http://gist.github.com), then [append your resulting gist id to the end of any gist-reveal site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view the resulting presentation:
 
     http://gist-reveal.it/GIST_ID_CONTAINING_REVEALJS_SLIDE_CONTENT
     
@@ -15,7 +17,19 @@ Example:
 
     http://gist-reveal.it/af84d40e58c5c2a908dd
 
-I usually use [bitly](bit.ly) or another url shortener to make these long urls easier to share (and to make the clicks easier to count)
+Use [bitly](http://bit.ly) or another url shortener to make these long urls easier to share, and to make enagement rates easier to count.
+
+#### gist-reveal.it/bit.ly/SHORTNAME
+
+Creating a [bit.ly](http://bit.ly) shortname for your longer `gist-reveal/gist_id` deck urls will also make your presentations available at an alternate presentation path:
+
+    http://gist-reveal.it/bit.ly/SHORTNAME
+    
+Example:
+
+    http://gist-reveal.it/bit.ly/k8s-workshops
+    
+Much nicer!  Make sure to continue sending traffic to the shorter `bit.ly/shortname` url for metrics collection purposes.
 
 ## Gist-powered Slideshow Themes
 

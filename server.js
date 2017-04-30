@@ -44,6 +44,11 @@ var sanitize = function(slideshow_content){
       'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background']
     }
 })}
+
+// needs gc, max size = 25?
+var bitly_short_names = [];
+var bitly_gist_ids = [];
+
 var config = cc({
   REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
@@ -54,10 +59,10 @@ var config = cc({
 , GA_TRACKER : process.env.GA_TRACKER
 , REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
 , TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Runs on Kubernetes"
-, TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "img/runsonk8s.svg"
+, TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "/img/runsonk8s.svg"
 , TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://github.com/ryanj/gist-reveal#running-gist-revealit"
 , TEMPLATE_GIST_TEXT : process.env.TEMPLATE_GIST_TEXT || "Presentation Source"
-, TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "img/presentation_source.svg"
+, TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presentation_source.svg"
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
 var createHash = function(secret) {
@@ -100,6 +105,7 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist.id)
                            .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT'))
                            .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG'))
+                           .replace(/\{\{gist_id}}/, gist.id)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
     )
@@ -159,22 +165,71 @@ var get_theme = function(gist_id, cb) {
   })
 }
 
+
+var get_bitlink = function(req, res, next) {
+  var short_name = req.params.short_name || req.query.short_name;
+  var payload_id,payload_offset,id_start,payload_end;
+  var payload_identifier="<meta name=\"gist_id\" content=\"";
+
+  //if the bitly_short_name is in the cache, call get_slides on the cached id
+  if( !!bitly_short_names[short_name] ){
+    //console.log("gist_id found in bitlink cache");
+    req.params.gist_id = bitly_short_names[short_name];
+    get_slides(req, res, next);
+  
+  //else return a redirect to bit.ly, let them service the request
+  } else {
+
+    console.log('looking up bitlink: http://bit.ly/' + short_name );
+    request({url: "http://bit.ly/"+short_name },
+      function(error, response, payload){
+        if (!error && response.statusCode == 200) {
+          payload_offset = payload.indexOf(payload_identifier)
+          id_start = payload_offset+payload_identifier.length;
+          payload_end = payload.indexOf('"', id_start)
+          payload_id = payload.substring(id_start, payload_end);
+          //console.log("bitlink id: " + payload_id);
+          if(payload_offset !== -1 && payload_id){
+            if(!bitly_short_names[short_name] && !bitly_gist_ids[payload_id]){
+              bitly_short_names[short_name] = payload_id;
+              bitly_gist_ids[payload_id] = short_name;
+              console.log("bitlink gist_id cached: " + payload_id);
+            }
+          }else{
+            console.log("bitlink not found: bit.ly/"+short_name);
+          }
+        }else{
+          console.log("bitlink not found: bit.ly/"+short_name);
+        }
+      }
+    );
+
+    //console.log("redirecting to: bit.ly/" + short_name);
+    res.redirect('http://bit.ly/' + short_name);
+  }
+};
+
 var get_slides = function(req, res, next) {
   var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
-  var theme = req.query['theme'] || config.get('REVEAL_THEME');
-  get_gist(gist_id, function (error, response, api_response) {
-    if (!error && response.statusCode == 200) {
-      gist = JSON.parse(api_response);
-    }else if (response.statusCode == 403){
-      gist = rate_limit_slides;
-    }else{
-      gist = error_slides;
-    }
-    render_slideshow(gist, theme, function(slides){
-      res.send(slides);
-      //return next();
+  if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') == -1 ){
+    //console.log("redirecting to: /bit.ly/" + bitly_gist_ids[gist_id]);
+    res.redirect("/bit.ly/"+bitly_gist_ids[gist_id]);
+  }else{
+    var theme = req.query['theme'] || config.get('REVEAL_THEME');
+    get_gist(gist_id, function (error, response, api_response) {
+      if (!error && response.statusCode == 200) {
+        gist = JSON.parse(api_response);
+      }else if (response.statusCode == 403){
+        gist = rate_limit_slides;
+      }else{
+        gist = error_slides;
+      }
+      render_slideshow(gist, theme, function(slides){
+        res.send(slides);
+        //return next();
+      });
     });
-  });
+  }
 }
 
 var get_gist = function(gist_id, cb) {
@@ -230,6 +285,10 @@ app.get("/status", function(req,res,next) {
 
 // Static files:
 app.use(express.static(__dirname))
+
+// Bit.ly shortname integration
+app.get("/bitly/:short_name", get_bitlink);
+app.get("/bit\.ly/:short_name", get_bitlink);
 
 // Gist templates:
 app.get("/:gist_id", get_slides);

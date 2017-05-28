@@ -3,18 +3,18 @@
 
 	<head>
 		<meta charset="utf-8">
-
-		<title>{{title}}</title>
-
-		<link rel="icon" type="image/png" href="/img/k8s-favicon.png"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 		<meta name="description" content="{{description}}">
 		<meta name="author" content="{{user}}">
 		<meta name="gist_id" content="{{gist_id}}">
 
+		<title>{{title}}</title>
+
+		<link rel="icon" type="image/png" href="/img/k8s-favicon.png"/>
+
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
     <style id='site_logo_css' type='text/css'>
       .reveal #logo-link {
@@ -41,8 +41,8 @@
       }
     </style>
 
-		<link rel="stylesheet" href="/node_modules/reveal.js/css/reveal.css">
                 <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
+		<link rel="stylesheet" href="/css/reveal.css">
                 <link rel="stylesheet" href="/node_modules/reveal.js/css/theme/black.css" id="theme">
 		<link rel="stylesheet" href="/css/theme/{{theme}}.css" id="theme">
 
@@ -51,13 +51,11 @@
 
 		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 		<script>
-			if( window.location.search.match( /print-pdf/gi ) ) {
-				var link = document.createElement( 'link' );
-				link.rel = 'stylesheet';
-				link.type = 'text/css';
-				link.href = '/css/print/pdf.css';
-				document.getElementsByTagName( 'head' )[0].appendChild( link );
-			}
+                        var link = document.createElement( 'link' );
+                        link.rel = 'stylesheet';
+                        link.type = 'text/css';
+                        link.href = window.location.search.match( /print-pdf/gi ) ? '/node_modules/reveal.js/css/print/pdf.css' : '/node_modules/reveal.js/css/print/paper.css';
+                        document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script> 
 
 		<!--[if lt IE 9]>
@@ -79,10 +77,10 @@
 
 		</div>
 
-                //{{ga-tracker}}
-
 		<script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
-		<script src="/node_modules/reveal.js/js/reveal.js"></script>
+		<script src="/js/reveal.js"></script>
+
+                //{{ga-tracker}}
 
 		<script>
 
@@ -90,6 +88,7 @@
 			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				controls: true,
+				controlsTutorial: true,
 				progress: true,
 				history: true,
 				center: true,
@@ -103,7 +102,7 @@
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
-					{ src: 'http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js', async: true },
+					{ src: 'http://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js', async: true },
 					{ src: '/js/client.js', async: true },
 					{ src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
 					{ src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },

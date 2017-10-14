@@ -37,11 +37,12 @@ var sanitize = function(slideshow_content){
       'tr': ['class','style'],
       'td': ['class','style'],
       'span': ['class','style'],
+      'video': ['class','style','data-autoplay'],
       'aside': ['class'],
       'code': ['class','style','contenteditable'],
       'a': ['href', 'name', 'target', 'style','class'],
       'img': ['src','class','style'],
-      'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background']
+      'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background', 'data-background-color', 'data-autoslide','data-background-image','data-background-size','data-background-position','data-background-repeat', 'data-background-video-loop', 'data-background-video-muted', 'data-background-video', 'data-transition-speed']
     }
 })}
 

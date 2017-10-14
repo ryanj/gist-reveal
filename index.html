@@ -39,6 +39,10 @@
         box-shadow: none;
         background: transparent;
       }
+      body.print-pdf .reveal .callouts {display:none; !important}
+      @media print {
+        .reveal .callouts {display:none; !important}
+      }
     </style>
 
                 <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
@@ -72,8 +76,8 @@
 			<div class="slides">
       {{slides}}
       </div>
-      <a id='logo-link' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
-      <a id='gist-link' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
+      <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
+      <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
 
 		</div>
 

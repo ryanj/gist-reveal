@@ -68,7 +68,7 @@
 
 	</head>
 
-	<body>
+	<body onload="revealit()">
 
 		<div class="reveal">
 
@@ -81,16 +81,22 @@
 
 		</div>
 
-		<script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
+		<!--
+	        <script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
 		<script src="/js/reveal.js"></script>
+		-->
+		<script src="/js/reveal-bundle.js"></script>
 
                 //{{ga-tracker}}
 
 		<script>
-
+                    var revealit = function(){
 			// Full list of configuration options available here:
 			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
+				width: 960,
+				height: 710,
+				margin: 0.1,
 				controls: true,
 				controlsTutorial: true,
 				progress: true,
@@ -116,8 +122,7 @@
 					{ src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
-
+		    }
 		</script>
-
 	</body>
 </html>

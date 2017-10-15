@@ -43,15 +43,25 @@
       @media print {
         .reveal .callouts {display:none; !important}
       }
+      img {
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      img[data-src] {
+        opacity: 0;
+      }
     </style>
 
                 <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
+                <!-- Code syntax highlighting -->
+		<!-- 
+	        <link rel="stylesheet" href="/node_modules/reveal.js/lib/css/zenburn.css">
 		<link rel="stylesheet" href="/css/reveal.css">
                 <link rel="stylesheet" href="/node_modules/reveal.js/css/theme/black.css" id="theme">
+		-->
+		<link rel="stylesheet" href="/css/reveal-bundle.css">
 		<link rel="stylesheet" href="/css/theme/{{theme}}.css" id="theme">
 
-                <!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="/node_modules/reveal.js/lib/css/zenburn.css">
 
 		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 		<script>
@@ -76,8 +86,8 @@
 			<div class="slides">
       {{slides}}
       </div>
-      <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
-      <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
+      <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" data-src="{{template_logo_img}}" /></a>
+      <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" data-src="{{template_gist_img}}" /></a>
 
 		</div>
 
@@ -122,6 +132,13 @@
 					{ src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
 			});
+
+                        [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
+                            img.setAttribute('src', img.getAttribute('data-src'));
+                            img.onload = function() {
+                                img.removeAttribute('data-src');
+                            };
+                        });
 		    }
 		</script>
 	</body>

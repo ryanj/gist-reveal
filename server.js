@@ -37,11 +37,12 @@ var sanitize = function(slideshow_content){
       'tr': ['class','style'],
       'td': ['class','style'],
       'span': ['class','style'],
-      'video': ['class','style','data-autoplay'],
+      'audio': ['class','style','data-autoplay','data-src'],
+      'video': ['class','style','data-autoplay','data-src'],
       'aside': ['class'],
-      'code': ['class','style','contenteditable'],
+      'code': ['class','style','contenteditable','data-trim'],
       'a': ['href', 'name', 'target', 'style','class'],
-      'img': ['src','class','style'],
+      'img': ['src','class','style','data-src'],
       'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background', 'data-background-color', 'data-autoslide','data-background-image','data-background-size','data-background-position','data-background-repeat', 'data-background-video-loop', 'data-background-video-muted', 'data-background-video', 'data-transition-speed']
     }
 })}
@@ -166,6 +167,7 @@ var get_theme = function(gist_id, cb) {
   })
 }
 
+var concurrency = 0;
 
 var get_bitlink = function(req, res, next) {
   var short_name = req.params.short_name || req.query.short_name;
@@ -253,6 +255,8 @@ app.get("/token", function(req,res) {
 });
 
 io.sockets.on('connection', function(socket) {
+  concurrency = concurrency+1;
+  console.log("Concurrency: " + concurrency)
   var checkAndReflect = function(data){
     if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
     if (createHash(data.secret) === data.socketId) {
@@ -266,6 +270,10 @@ io.sockets.on('connection', function(socket) {
   };
 	socket.on('slidechanged', checkAndReflect);
   socket.on('navigation', checkAndReflect);
+  socket.on('disconnect', function(){
+    concurrency = concurrency -1;
+    console.log("Concurrency: " + concurrency)
+  })
 });
 
 var getTokens = function(){

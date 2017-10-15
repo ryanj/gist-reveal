@@ -53,15 +53,16 @@
     </style>
 
                 <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
-                <!-- Code syntax highlighting -->
-		<!-- 
-	        <link rel="stylesheet" href="/node_modules/reveal.js/lib/css/zenburn.css">
+
+		<!-- Bundle the following assets during the build process
 		<link rel="stylesheet" href="/css/reveal.css">
                 <link rel="stylesheet" href="/node_modules/reveal.js/css/theme/black.css" id="theme">
 		-->
+                <!-- Code syntax highlighting -->
+		<!-- <link rel="stylesheet" href="/node_modules/reveal.js/lib/css/zenburn.css"> -->
 		<link rel="stylesheet" href="/css/reveal-bundle.css">
-		<link rel="stylesheet" href="/css/theme/{{theme}}.css" id="theme">
 
+		<link rel="stylesheet" href="/css/theme/{{theme}}.css" id="theme">
 
 		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 		<script>
@@ -91,11 +92,11 @@
 
 		</div>
 
-		<!--
-	        <script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
+		<script src="/js/reveal-bundle.js"></script>
+		<!-- 
+	  	<script src="/node_modules/reveal.js/lib/js/head.min.js"></script> 
 		<script src="/js/reveal.js"></script>
 		-->
-		<script src="/js/reveal-bundle.js"></script>
 
                 //{{ga-tracker}}
 
@@ -127,12 +128,11 @@
 					{ src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
 					{ src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
 					{ src: '/node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-                                        { src: '/node_modules/reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: '/node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-					{ src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					{ src: '/node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); } }
 				]
 			});
 
+			// Lazy loading of images with the data-src attr
                         [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
                             img.setAttribute('src', img.getAttribute('data-src'));
                             img.onload = function() {

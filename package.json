@@ -8,7 +8,7 @@
     "start": "node server.js",
     "build": "npm run build-js & npm run build-css",
     "build-js": "cat node_modules/reveal.js/lib/js/head.min.js js/reveal.js > js/reveal-bundle.js",
-    "build-css": "cat node_modules/reveal.js/lib/css/zenburn.css css/reveal.css node_modules/reveal.js/css/theme/black.css > css/reveal-bundle.css",
+    "build-css": "cat css/reveal.css node_modules/reveal.js/css/theme/black.css node_modules/reveal.js/lib/css/zenburn.css > css/reveal-bundle.css",
     "postinstall": "npm run build"
   },
   "author": {

@@ -13,7 +13,6 @@ var mkdirp  = require('mkdirp');
 var rate_limit_slides = require('./rate_limit_response.json');
 var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
-var slideshow_template = fs.readFileSync( __dirname + '/index.html');
 var sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div']),
@@ -95,7 +94,7 @@ var render_slideshow = function(gist, theme, cb) {
     }
   }
   get_theme(theme, function(themename){
-    var index = cb(slideshow_template.toString()
+    var index = cb( fs.readFileSync( __dirname + '/index.html').toString()
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
                            .replace(/\{\{title}}/, title)

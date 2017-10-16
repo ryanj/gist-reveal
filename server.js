@@ -254,27 +254,29 @@ app.get("/token", function(req,res) {
   res.send('Information about setting up your presentation environment is available in the server logs');
 });
 
-io.on('connection', function(socket) {
-  concurrency = concurrency+1;
-  console.log("Concurrency: " + concurrency)
-  var checkAndReflect = function(data){
-    if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
-    if (createHash(data.secret) === data.socketId) {
-      data.secret = null; 
-      socket.broadcast.emit(data.socketId, data);
-      console.dir(data);
-    }else{
-      console.log('Discarding mismatched socket data:');
-      console.dir(data);
-    };      
-  };
-  socket.on('slidechanged', checkAndReflect);
-  socket.on('navigation', checkAndReflect);
-  socket.on('disconnect', function(){
-    concurrency = concurrency -1;
+if(config.get('WEBSOCKET_ENABLED') !== "false"){ 
+  io.on('connection', function(socket) {
+    concurrency = concurrency+1;
     console.log("Concurrency: " + concurrency)
-  })
-});
+    var checkAndReflect = function(data){
+      if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
+      if (createHash(data.secret) === data.socketId) {
+        data.secret = null; 
+        socket.broadcast.emit(data.socketId, data);
+        console.dir(data);
+      }else{
+        console.log('Discarding mismatched socket data:');
+        console.dir(data);
+      };      
+    };
+    socket.on('slidechanged', checkAndReflect);
+    socket.on('navigation', checkAndReflect);
+    socket.on('disconnect', function(){
+      concurrency = concurrency -1;
+      console.log("Concurrency: " + concurrency)
+    })
+  });
+}
 
 var getTokens = function(){
   var secret = config.get('REVEAL_SOCKET_SECRET');

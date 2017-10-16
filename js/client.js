@@ -1,4 +1,5 @@
 (function() {
+if(Reveal.getConfig().hosted){
     var hosted = Reveal.getConfig().hosted;
     var socket = io.connect(document.location.protocol+'//'+document.location.host);
     var socketId = hosted.id;
@@ -80,4 +81,5 @@
         	if( typeof event.origin === 'undefined' && event.origin !== 'remote' ) socket.emit('slidechanged', slideData);
         } );
     }
+}
 }());

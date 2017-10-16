@@ -2,14 +2,14 @@ var express		= require('express');
 var fs			= require('fs');
 var crypto		= require('crypto');
 var cc                  = require('config-multipaas');
-var app = express()
-  , http = require('http')
-  , server = http.createServer(app)
-  , io = require('socket.io').listen(server);
+var http = require('http')
 var path    = require('path');
-var request = require('request');
-var sanitizeHtml = require('sanitize-html');
 var mkdirp  = require('mkdirp');
+var request = require('request');
+var app = express()
+var server = http.createServer(app)
+var io = require('socket.io')(server);
+var sanitizeHtml = require('sanitize-html');
 var rate_limit_slides = require('./rate_limit_response.json');
 var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
@@ -52,6 +52,7 @@ var bitly_gist_ids = [];
 
 var config = cc({
   REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
+, WEBSOCKET_ENABLED : process.env.WEBSOCKET_ENABLED || "true"
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
 , REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
 , GIST_THEMES : process.env.GIST_THEMES || "true"
@@ -253,7 +254,7 @@ app.get("/token", function(req,res) {
   res.send('Information about setting up your presentation environment is available in the server logs');
 });
 
-io.sockets.on('connection', function(socket) {
+io.on('connection', function(socket) {
   concurrency = concurrency+1;
   console.log("Concurrency: " + concurrency)
   var checkAndReflect = function(data){
@@ -267,7 +268,7 @@ io.sockets.on('connection', function(socket) {
       console.dir(data);
     };      
   };
-	socket.on('slidechanged', checkAndReflect);
+  socket.on('slidechanged', checkAndReflect);
   socket.on('navigation', checkAndReflect);
   socket.on('disconnect', function(){
     concurrency = concurrency -1;
@@ -284,6 +285,9 @@ var getTokens = function(){
 
 var getClientConfig = function(){
   var tokens = getTokens();
+  if(config.get('WEBSOCKET_ENABLED') == "false"){
+    return "hosted: false";
+  }
   return "hosted:{ id: '"+tokens.socket_id+"' }";
 };
 app.get("/", get_slides);

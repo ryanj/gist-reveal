@@ -116,19 +116,19 @@ var render_slideshow = function(gist, theme, cb) {
 
 var install_theme = function(gist){
   var title, data;
-  var theme_folder = path.resolve('css','theme',gist.id);
+  var theme_folder = path.resolve('css','theme','gists',gist.id);
   console.log("installing gist: "+gist.id);
   mkdirp(theme_folder);
   for(var i in gist.files){
     filenm = gist.files[i].filename;
     data = gist.files[i].content;
     if( gist.files[i].type == "text/css"){
-      filename = path.resolve('css','theme',gist.id,gist.id+".css")
+      filename = path.resolve('css','theme','gists',gist.id,gist.id+".css")
       fs.writeFile(filename, data, function(err){
         console.log('theme installed: '+gist.id);
       });
     }else{
-      filename = path.resolve('css','theme',gist.id,filenm)
+      filename = path.resolve('css','theme','gists',gist.id,filenm)
       request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', function(err) {
           console.log(err)
       })
@@ -141,12 +141,12 @@ var get_theme = function(gist_id, cb) {
     // if theme installation is disabled, return immediately
     cb(gist_id)
   }
-  var theme_folder = path.resolve( 'css','theme', gist_id );
+  var theme_folder = path.resolve( 'css','theme', 'gists', gist_id );
   //if theme is found locally, return gist_id;
   fs.stat( theme_folder, function(err, stats){
     if(!err){
       //console.log("not installing locally available theme: " + gist_id);
-      cb(gist_id+'/'+gist_id);
+      cb('gists/'+gist_id+'/'+gist_id);
     }else{
       //console.log("installing css theme: " + gist_id);
       get_gist(gist_id, function(error, response, api_response){
@@ -155,7 +155,7 @@ var get_theme = function(gist_id, cb) {
           gist = JSON.parse(api_response);
           install_theme(gist);
           console.log("gist retrieved : " + gist_id);
-          cb(gist_id+'/'+gist_id)
+          cb('gists/'+gist_id+'/'+gist_id)
         }else{
           //not found
           console.log("gist not found");
@@ -303,13 +303,9 @@ app.get("/:gist_id", get_slides);
 
 // Actually listen
 server.listen(config.get('PORT'), config.get('IP'), function(){
-  get_theme(config.get('REVEAL_THEME'), function(){
-    //if the default theme is a gist_id, prime the cache 
-  })
+  var brown = '\033[33m',
+      green = '\033[32m',
+      reset = '\033[0m';
+
+  console.log( brown + "reveal.js:" + reset + " Multiplex running on "+config.get('IP')+":" + green + config.get('PORT') + reset );
 });
-
-var brown = '\033[33m',
-	green = '\033[32m',
-	reset = '\033[0m';
-
-console.log( brown + "reveal.js:" + reset + " Multiplex running on port " + green + config.get('PORT') + reset );

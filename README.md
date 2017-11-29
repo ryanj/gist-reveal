@@ -140,25 +140,6 @@ oc start-build gistreveal
 
 To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `oc build-logs`. For example: `oc build-logs gistreveal-1`.
 
-### OpenShift.com
-
-This application will also run on any OpenShiftV2 cloud using the `rhc` command-line tool:
-
-```bash
-rhc app create gistreveal nodejs-0.10 \
---from-code=http://github.com/ryanj/gist-reveal \ 
-DEFAULT_GIST=${DEFAULT_GIST} \ 
-GH_CLIENT_SECRET=${GH_CLIENT_SECRET} \ 
-GH_CLIENT_ID=${GH_CLIENT_ID} \ 
-REVEAL_SOCKET_SECRET=0P3N-S0URC3 \ 
-GA_TRACKER=YOUR_GA_TRACKER
-```
-
-Or, [click here to launch on the web](https://openshift.redhat.com/app/console/application_types/custom?name=reveal&initial_git_url=https%3A%2F%2Fgithub.com/ryanj/gist-reveal.git&cartridges[]=nodejs-0.10)!
-
-Then, use the `rhc env set` command to publish [configuration strings](#application-config) into the application's system environment.
-
-    
 ## License
 
 [gist-reveal.it](http://gist-reveal.it/) was created at the first [DockerCon Hackathon](http://blog.docker.com/2014/07/dockercon-video-dockercon-hackathon-winners/) by [@ryanj](https://github.com/ryanj) and [@fkautz](https://github.com/fkautz).

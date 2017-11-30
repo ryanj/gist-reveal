@@ -15,7 +15,7 @@ var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
 var sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div']),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote']),
     allowedAttributes: {
       'h1': ['class','style'],
       'h2': ['class','style'],
@@ -28,6 +28,7 @@ var sanitize = function(slideshow_content){
       'ol': ['class','style'],
       'ul': ['class','style'],
       'li': ['class','style'],
+      'blockquote': ['class','style'],
       'pre': ['class','style'],
       'dl': ['class','style'],
       'dt': ['class','style'],

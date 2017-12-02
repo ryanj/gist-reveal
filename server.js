@@ -56,6 +56,7 @@ var config = cc({
 , WEBSOCKET_ENABLED : process.env.WEBSOCKET_ENABLED || "true"
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
 , REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
+, DEBUG : Number(process.env.DEBUG) || 0
 , GIST_THEMES : process.env.GIST_THEMES || "true"
 , GH_CLIENT_ID : process.env.GH_CLIENT_ID
 , GH_CLIENT_SECRET : process.env.GH_CLIENT_SECRET
@@ -258,7 +259,9 @@ app.get("/token", function(req,res) {
 if(config.get('WEBSOCKET_ENABLED') !== "false"){ 
   io.on('connection', function(socket) {
     concurrency = concurrency+1;
-    console.log("Concurrency: " + concurrency)
+    if(config.get('DEBUG') >= 2){
+      console.log("Concurrency: " + concurrency)
+    }
     var checkAndReflect = function(data){
       if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
       if (createHash(data.secret) === data.socketId) {
@@ -274,7 +277,9 @@ if(config.get('WEBSOCKET_ENABLED') !== "false"){
     socket.on('navigation', checkAndReflect);
     socket.on('disconnect', function(){
       concurrency = concurrency -1;
-      console.log("Concurrency: " + concurrency)
+      if(config.get('DEBUG') >= 2){
+        console.log("Concurrency: " + concurrency)
+      }
     })
   });
 }

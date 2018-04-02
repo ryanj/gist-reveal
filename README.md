@@ -42,7 +42,7 @@ Available CSS themes include [the default reveal.js list of themes](http://lab.h
  * [the revealjs league theme](http://gist-reveal.it/?theme=default#/themes)
  * [the revealjs sky theme](http://gist-reveal.it/?theme=sky#/themes)
 
-Conference organizers can host their own modified gist-reveal templating service (with it's own default theme), to provide a consistent look for all presentations at an event.
+Conference organizers can host their own modified gist-reveal templating service (with its own default theme), to provide a consistent look for all presentations at an event.
 
 ### Application Config
 

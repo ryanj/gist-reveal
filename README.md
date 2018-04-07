@@ -60,7 +60,7 @@ IP_ADDR | The server IP address | 0.0.0.0
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically "url/?theme=gist_id". Disable this feature by setting this config to the string "false". | "true"
 REVEAL_SOCKET_SECRET | the site's broadcast token (alphanumeric) | randomly generated
 
-See [`plugin/hosted/index.js`](https://github.com/ryanj/gist-reveal.it/edit/master/plugin/hosted/index.js) for more information about the site's configuration options.
+See [`server.js`](https://github.com/ryanj/gist-reveal/blob/master/server.js#L55-L70) for more information about the site's configuration options.
 
 ### Broadcasting Slide Transitions
 

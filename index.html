@@ -79,18 +79,18 @@
 
 	</head>
 
-	<body onload="revealit()">
+  <body onload="revealit()">
 
-		<div class="reveal">
+    <div class="reveal">
 
-			<!-- Any section element inside of this container is displayed as a slide -->
-			<div class="slides">
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
       {{slides}}
       </div>
-      <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" data-src="{{template_logo_img}}" /></a>
-      <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" data-src="{{template_gist_img}}" /></a>
 
-		</div>
+      <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
+      <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
+    </div>
 
 		<script src="/js/reveal-bundle.js"></script>
 		<!-- 
@@ -123,7 +123,7 @@
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
-					{ src: 'http://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js', async: true },
+					{ src: 'http://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js', async: true },
 					{ src: '/js/client.js', async: true },
 					{ src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
 					{ src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
@@ -133,13 +133,13 @@
 			});
 
 			// Lazy loading of images with the data-src attr
-                        [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
-                            img.setAttribute('src', img.getAttribute('data-src'));
-                            img.onload = function() {
-                                img.removeAttribute('data-src');
-                            };
-                        });
+                        //[].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
+                        //    img.setAttribute('src', img.getAttribute('data-src'));
+                        //    img.onload = function() {
+                        //        img.removeAttribute('data-src');
+                        //    };
+                        //});
 		    }
 		</script>
-	</body>
+  </body>
 </html>

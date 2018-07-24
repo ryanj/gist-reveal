@@ -65,8 +65,8 @@ var config = cc({
 , TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Runs on Kubernetes"
 , TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "/img/runsonk8s.svg"
 , TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://github.com/ryanj/gist-reveal#running-gist-revealit"
-, TEMPLATE_GIST_TEXT : process.env.TEMPLATE_GIST_TEXT || "Presentation Source"
-, TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presentation_source.svg"
+, TEMPLATE_GIST_TEXT : process.env.TEMPLATE_GIST_TEXT || "Presented by: @"
+, TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presented_by/"
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
 var createHash = function(secret) {
@@ -107,8 +107,8 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
                            .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
                            .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist.id)
-                           .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT'))
-                           .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG'))
+                           .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT')+gist.owner.login)
+                           .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG')+gist.owner.login+'.svg')
                            .replace(/\{\{gist_id}}/, gist.id)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
@@ -168,6 +168,17 @@ var get_theme = function(gist_id, cb) {
     }
   })
 }
+
+var svgtemplate = function (req, res, next)
+{
+  var presenter_name = req.params.username || 'gist-reveal';
+  var data = fs.readFileSync(__dirname + '/img/presented_by.svg');
+  //console.log('button: {text: "'+presenter_name+'"}')
+  //console.log("request url:" + req.url)
+  res.status(200);
+  res.header('Content-Type', 'image/svg+xml');
+  res.end(data.toString().replace(/gist-reveal/, "@"+presenter_name));
+};
 
 var concurrency = 0;
 
@@ -305,6 +316,11 @@ app.get("/status", function(req,res,next) {
 
 // Static files:
 app.use(express.static(__dirname))
+
+// SVG templating
+app.get("/img/presented_by/:username\.svg", svgtemplate);
+app.get("/img/presented_by/:username.svg", svgtemplate);
+app.get("/img/presented_by/:username", svgtemplate);
 
 // Bit.ly shortname integration
 app.get("/bitly/:short_name", get_bitlink);

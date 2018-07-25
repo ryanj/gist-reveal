@@ -1,4 +1,6 @@
 # Gist-Reveal
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/ryanj/gist-reveal.svg)](https://greenkeeper.io/)
 [![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.svg)](https://travis-ci.org/ryanj/gist-reveal) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.svg)](https://david-dm.org/ryanj/gist-reveal) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
 
 ## Gist-powered Revealjs presentations
@@ -40,7 +42,7 @@ Available CSS themes include [the default reveal.js list of themes](http://lab.h
  * [the revealjs league theme](http://gist-reveal.it/?theme=default#/themes)
  * [the revealjs sky theme](http://gist-reveal.it/?theme=sky#/themes)
 
-Conference organizers can host their own modified gist-reveal templating service (with it's own default theme), to provide a consistent look for all presentations at an event.
+Conference organizers can host their own modified gist-reveal templating service (with its own default theme), to provide a consistent look for all presentations at an event.
 
 ### Application Config
 
@@ -58,7 +60,7 @@ IP_ADDR | The server IP address | 0.0.0.0
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically "url/?theme=gist_id". Disable this feature by setting this config to the string "false". | "true"
 REVEAL_SOCKET_SECRET | the site's broadcast token (alphanumeric) | randomly generated
 
-See [`plugin/hosted/index.js`](https://github.com/ryanj/gist-reveal.it/edit/master/plugin/hosted/index.js) for more information about the site's configuration options.
+See [`server.js`](https://github.com/ryanj/gist-reveal/blob/master/server.js#L55-L70) for more information about the site's configuration options.
 
 ### Broadcasting Slide Transitions
 
@@ -112,33 +114,11 @@ docker run -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_G
 
 ### OpenShiftV3
 
-Build from GitHub, using Source2Image:
+Build from GitHub sources, using a "nodejs" base image, and Source2Image:
 
 ```bash
-oc process -v REVEAL_SOCKET_SECRET=1234 -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-github.json | oc create -f -
+oc new-app nodejs~http://github.com/ryanj/gist-reveal -e REVEAL_SOCKET_SECRET=1234
 ```
-
-Deploy a pre-built image from DockerHub:
-
-```bash
-oc process -v REVEAL_SOCKET_SECRET=1234 -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-dockerhub.json | oc create -f -
-```
-
-Or, install one or both of the templates to make these projects easier to launch (from the web, or via `oc new-app templatename`):
-
-```bash
-oc create -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-dockerhub.json
-oc create -f https://raw.githubusercontent.com/ryanj/gist-reveal/master/gist-reveal-github.json
-oc process gistreveal -v DEFAULT_GIST=${DEFAULT_GIST},GH_CLIENT_ID=${GH_CLIENT_ID},GH_CLIENT_SECRET=${GH_CLIENT_SECRET},REVEAL_SOCKET_SECRET=${REVEAL_SOCKET_SECRET} | oc create -f -
-```
-
-If you are building from GitHub, using S2I, you should be able to trigger a build with the following command:
-
-```
-oc start-build gistreveal
-```
-
-To view the logs for the build, use `osc get builds` to find its name, and supply that name to the command `oc build-logs`. For example: `oc build-logs gistreveal-1`.
 
 ## License
 

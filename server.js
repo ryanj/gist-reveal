@@ -177,7 +177,7 @@ var svgtemplate = function (req, res, next)
   //console.log("request url:" + req.url)
   res.status(200);
   res.header('Content-Type', 'image/svg+xml');
-  res.end(data.toString().replace(/gist-reveal/, "@"+presenter_name));
+  res.end(data.toString().replace(/gist-reveal/, presenter_name));
 };
 
 var concurrency = 0;

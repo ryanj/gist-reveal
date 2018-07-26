@@ -224,7 +224,7 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9999999"
-     inkscape:cx="74.873269"
+     inkscape:cx="31.685769"
      inkscape:cy="60.266165"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -259,7 +259,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -279,28 +279,28 @@
        rx="6.3738832"
        ry="7.7980428" />
     <g
-       transform="matrix(1.2920285,0,0,1.5522434,1043.0858,-13.090175)"
+       transform="matrix(1.3637153,0,0,1.5522434,1034.2612,-13.090175)"
        id="g6013">
       <text
-         x="118.33573"
-         y="396.00891"
-         style="font-weight:bold;font-size:9.11886311px;font-family:'Overpass Bold';letter-spacing:0.84803653px;opacity:0.6;fill:#ffffff;fill-opacity:1;stroke-width:0.94226271"
+         x="120.50847"
+         y="388.96594"
+         style="font-weight:bold;font-size:8.95668507px;font-family:'Overpass Bold';letter-spacing:0.83295435px;opacity:0.6;fill:#ffffff;fill-opacity:1;stroke-width:0.92550474"
          id="text3251"
-         transform="scale(1.0329445,0.96810622)"
-         inkscape:transform-center-y="2.8163043"
-         inkscape:transform-center-x="-4.3820604e-05">Presented by</text>
+         transform="scale(1.0145737,0.98563565)"
+         inkscape:transform-center-y="2.8163175"
+         inkscape:transform-center-x="-3.554108e-05">Presented by</text>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:22.66469383px;line-height:12.46558189px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.56661731px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         x="112.38414"
-         y="432.93848"
+         style="font-style:normal;font-weight:bold;font-size:23.79162216px;line-height:13.08539391px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.69976282px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="117.31117"
+         y="414.83072"
          id="text5220"
-         transform="scale(1.0915386,0.91613803)"><tspan
+         transform="scale(1.0456648,0.9563294)"><tspan
            sodipodi:role="line"
            id="tspan5218"
-           x="112.38414"
-           y="432.93848"
-           style="font-weight:bold;font-size:12.60539532px;line-height:12.46558189px;fill:#ffffff;fill-opacity:1;stroke-width:0.56661731px">gist-reveal</tspan></text>
+           x="117.31117"
+           y="414.83072"
+           style="font-weight:bold;font-size:13.23215675px;line-height:13.08539391px;fill:#ffffff;fill-opacity:1;stroke-width:0.59479052px">gist-reveal</tspan></text>
     </g>
     <path
        style="display:inline;opacity:0.43636367;fill:none;stroke:url(#linearGradient6171);stroke-width:0.870327;stroke-opacity:1"

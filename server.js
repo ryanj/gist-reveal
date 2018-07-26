@@ -73,6 +73,7 @@ var createHash = function(secret) {
 	var cipher = crypto.createCipher('blowfish', secret);
 	return(cipher.final('hex'));
 };
+var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
 var ga_tracker_html = function(tracker_id){
   if(typeof(tracker_id) !== 'undefined'){
     return "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" + 
@@ -107,8 +108,8 @@ var render_slideshow = function(gist, theme, cb) {
                            .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
                            .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
                            .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist.id)
-                           .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT')+gist.owner.login)
-                           .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG')+gist.owner.login+'.svg')
+                           .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT')+user)
+                           .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG')+user+'.svg')
                            .replace(/\{\{gist_id}}/, gist.id)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
@@ -172,12 +173,12 @@ var get_theme = function(gist_id, cb) {
 var svgtemplate = function (req, res, next)
 {
   var presenter_name = req.params.username || 'gist-reveal';
-  var data = fs.readFileSync(__dirname + '/img/presented_by.svg');
+  //var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
   //console.log('button: {text: "'+presenter_name+'"}')
   //console.log("request url:" + req.url)
   res.status(200);
   res.header('Content-Type', 'image/svg+xml');
-  res.end(data.toString().replace(/gist-reveal/, presenter_name));
+  res.end(presented_by.toString().replace(/gist-reveal/, presenter_name));
 };
 
 var concurrency = 0;

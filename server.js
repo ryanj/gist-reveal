@@ -230,7 +230,11 @@ var get_slides = function(req, res, next) {
   var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
   if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') == -1 ){
     //console.log("redirecting to: /bit.ly/" + bitly_gist_ids[gist_id]);
-    res.redirect("/bit.ly/"+bitly_gist_ids[gist_id]);
+    if( req.query['theme'] ){
+      res.redirect('/bit.ly/'+bitly_gist_ids[gist_id]+'?theme='+req.query['theme'] );
+    }else{
+      res.redirect("/bit.ly/"+bitly_gist_ids[gist_id]);
+    }
   }else{
     var theme = req.query['theme'] || config.get('REVEAL_THEME');
     get_gist(gist_id, function (error, response, api_response) {

@@ -13,6 +13,7 @@ var sanitizeHtml = require('sanitize-html');
 var rate_limit_slides = require('./rate_limit_response.json');
 var default_slides = require('./default_response.json');
 var error_slides = require('./error_response.json');
+var local_slide_resp = require('./local_slides.json');
 var sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote']),
@@ -62,6 +63,8 @@ var config = cc({
 , GH_CLIENT_SECRET : process.env.GH_CLIENT_SECRET
 , GA_TRACKER : process.env.GA_TRACKER
 , REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
+, GIST_PATH : process.env.GIST_PATH || __dirname || '.'
+, GIST_FILENAME : process.env.GIST_FILENAME
 , TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Runs on Kubernetes"
 , TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "/img/runsonk8s.svg"
 , TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://github.com/ryanj/gist-reveal#running-gist-revealit"
@@ -226,17 +229,39 @@ var get_bitlink = function(req, res, next) {
   }
 };
 
+var get_local_slides = function(cb){
+  var path = config.get('GIST_PATH');
+  var filename = config.get('GIST_FILENAME');
+  
+  //look up local file, inject it into the template
+  fs.readFile(path+'/'+filename, function( error, local_content ){
+    if(error){
+      local_slide_resp.files.local_slides.content="<section>"+error+"</section>"
+    }else{
+      local_slide_resp.files.local_slides.content=local_content
+    }
+    cb(local_slide_resp)
+  })
+}
+
 var get_slides = function(req, res, next) {
+  var theme = req.query['theme'] || config.get('REVEAL_THEME');
   var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
   if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') == -1 ){
     //console.log("redirecting to: /bit.ly/" + bitly_gist_ids[gist_id]);
     if( req.query['theme'] ){
-      res.redirect('/bit.ly/'+bitly_gist_ids[gist_id]+'?theme='+req.query['theme'] );
+      res.redirect('/bit.ly/'+bitly_gist_ids[gist_id]+'?theme='+theme);
     }else{
       res.redirect("/bit.ly/"+bitly_gist_ids[gist_id]);
     }
+  }else if( config.get('GIST_FILENAME')){
+    get_local_slides(function(gist){
+      render_slideshow(gist, theme, function(slides){
+        res.send(slides);
+        //return next();
+      });
+    });
   }else{
-    var theme = req.query['theme'] || config.get('REVEAL_THEME');
     get_gist(gist_id, function (error, response, api_response) {
       if (!error && response.statusCode == 200) {
         gist = JSON.parse(api_response);

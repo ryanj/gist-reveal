@@ -1,0 +1,15 @@
+{
+  "files": {
+    "local_slides": {
+      "type": "text/html"
+    }
+  },
+  "description": "gist-reveal - Local Development with Reveal.js",
+  "owner": {
+    "login": "localsource",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17562?",
+    "gravatar_id": "ee8fbe2cda4f05ef6dea595ced8f6e1a",
+    "url": "https://api.github.com/users/ryanj",
+    "html_url": "https://github.com/ryanj"
+  }
+}

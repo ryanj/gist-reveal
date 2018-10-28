@@ -181,7 +181,7 @@ var svgtemplate = function (req, res, next)
   //console.log("request url:" + req.url)
   res.status(200);
   res.header('Content-Type', 'image/svg+xml');
-  res.end(presented_by.toString().replace(/gist-reveal/, presenter_name));
+  res.end(presented_by.toString().replace(/gist-reveal/, "@"+presenter_name));
 };
 
 var concurrency = 0;
@@ -232,13 +232,17 @@ var get_bitlink = function(req, res, next) {
 var get_local_slides = function(cb){
   var path = config.get('GIST_PATH');
   var filename = config.get('GIST_FILENAME');
+  var escaped=filename.replace(/\//g, "//").replace(/'/g, "\'").replace(/"/g, '\"'); 
+  var filejson = {};
+  filejson[escaped]={'type': "text/html"};
+  local_slide_resp.files=filejson;
   
   //look up local file, inject it into the template
   fs.readFile(path+'/'+filename, function( error, local_content ){
     if(error){
-      local_slide_resp.files.local_slides.content="<section>"+error+"</section>"
+      local_slide_resp.files[escaped].content="<section>"+error+"</section>"
     }else{
-      local_slide_resp.files.local_slides.content=local_content
+      local_slide_resp.files[escaped].content=local_content
     }
     cb(local_slide_resp)
   })

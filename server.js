@@ -73,8 +73,8 @@ var config = cc({
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
 var createHash = function(secret) {
-	var cipher = crypto.createCipher('blowfish', secret);
-	return(cipher.final('hex'));
+	var cipher = crypto.createHash('md5').update(secret);
+	return(cipher.digest('hex'));
 };
 var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
 var ga_tracker_html = function(tracker_id){

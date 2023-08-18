@@ -79,12 +79,14 @@ var createHash = function(secret) {
 var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
 var ga_tracker_html = function(tracker_id){
   if(typeof(tracker_id) !== 'undefined'){
-    return "<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" + 
-    "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n" + 
-    "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n" + 
-    "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n" + 
-    "ga('create', '"+tracker_id+"', 'auto');\n" + 
-    "ga('send', 'pageview');</script>";
+    return "<!-- Google tag (gtag.js) -->\n"+
+    "<script async src='https://www.googletagmanager.com/gtag/js?id="+tracker_id+"'></script>\n"+
+    "<script>\n"+
+    "  window.dataLayer = window.dataLayer || [];\n"+
+    "  function gtag(){dataLayer.push(arguments);}\n"+
+    "  gtag('js', new Date());\n"+
+    "  gtag('config', '"+tracker_id+"');\n"+
+    "</script>";
   }else{
     return "";
   }

@@ -1,8 +1,5 @@
 # Gist-Reveal
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/ryanj/gist-reveal.svg)](https://greenkeeper.io/)
-[![Build Status](http://img.shields.io/travis/ryanj/gist-reveal.svg)](https://travis-ci.org/ryanj/gist-reveal) [![Build Status](http://img.shields.io/jenkins/s/https/build-shifter.rhcloud.com/slide-build.svg)](https://build-shifter.rhcloud.com/job/slide-build/) [![Dependency Check](http://img.shields.io/david/ryanj/gist-reveal.svg)](https://david-dm.org/ryanj/gist-reveal) [![Gitter Chat](https://badges.gitter.im/Chat.svg)](https://gitter.im/ryanj/gist-reveal.it?utm_source=badge)
-
 ## Gist-powered Revealjs presentations
 
 [Gist-Reveal.it](http://gist-reveal.it/) is an open source slideshow templating service that makes it easy to create, edit, present, and share [Reveal.js](https://github.com/hakimel/reveal.js) slides on the web by using github's [gist](http://gist.github.com) service as a datastore.
@@ -35,8 +32,7 @@ Much nicer!  Make sure to continue sending traffic to the shorter `bit.ly/shortn
 
 Available CSS themes include [the default reveal.js list of themes](http://lab.hakim.se/reveal-js/#/themes), but can be easily extended by storing new themes [in a gist](https://gist.github.com/450836bbaebcf4c4ae08b331343a7886):
 
- * [a theme from the CoreOS team](http://gist-reveal.it/?theme=450836bbaebcf4c4ae08b331343a7886#/themes)
- * [a theme for OpenShift fans](http://gist-reveal.it/?theme=60e54843de11a545897e#/themes)
+ * [a dark winter theme](http://gist-reveal.it/?theme=60e54843de11a545897e#/themes)
  * [the revealjs black theme](http://gist-reveal.it/?theme=black#/themes)
  * [the revealjs simple theme](http://gist-reveal.it/?theme=simple#/themes)
  * [the revealjs league theme](http://gist-reveal.it/?theme=default#/themes)
@@ -102,22 +98,13 @@ Minikube users should be able to open the new service in their browser by runnin
 To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
 
 ```bash
-docker pull ryanj/gist-reveal
-docker run -d -p 8080:8080 ryanj/gist-reveal
+docker run --rm -p 8080:8080 docker.io/ryanj/gist-reveal
 ```
 
 [Environment variables](#Application_Config) can be passed into the Docker container in order to configure the websocket relay, or to change the default slideshow content: 
 
 ```bash
-docker run -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
-```
-
-### OpenShiftV3
-
-Build from GitHub sources, using a "nodejs" base image, and Source2Image:
-
-```bash
-oc new-app nodejs~http://github.com/ryanj/gist-reveal -e REVEAL_SOCKET_SECRET=1234
+docker run --rm -p 8080:8080 -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
 ```
 
 ## License

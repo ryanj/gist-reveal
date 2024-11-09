@@ -2,12 +2,30 @@ var express		= require('express');
 var fs			= require('fs');
 var crypto		= require('crypto');
 var cc                  = require('config-multipaas');
-var http = require('http')
+var http = require('http');
+var https = require('https');
 var path    = require('path');
 var mkdirp  = require('mkdirp');
 var request = require('request');
-var app = express()
-var server = http.createServer(app)
+var app = express();
+var tls = {};
+try{
+  tls = {
+    key: process.env['PRIVATE_KEY'] || fs.readFileSync(__dirname + '/private.key', 'utf8'),
+    cert: process.env['PUBLIC_CRT'] || fs.readFileSync(__dirname + '/public.crt',  'utf8'),
+    maxVersion: 'TLSv1.3',
+    minVersion: 'TLSv1.2'
+  };
+  // certificates available!
+  console.log("protocol: https/wss")
+} catch (err){
+  console.error(err);
+  // certificates unavailable
+  // fallback to http/ws connections
+  console.log("protocol: http/ws")
+}
+var protocol = ( Object.keys(tls).length != 0 ) ? https : http;
+var server = protocol.createServer(tls, app);
 var io = require('socket.io')(server);
 var sanitizeHtml = require('sanitize-html');
 var rate_limit_slides = require('./rate_limit_response.json');

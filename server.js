@@ -1,13 +1,13 @@
-var express		= require('express');
-var fs			= require('fs');
-var crypto		= require('crypto');
-var cc                  = require('config-multipaas');
-var http = require('http');
-var https = require('https');
-var path    = require('path');
-var mkdirp  = require('mkdirp');
-var request = require('request');
-var app = express();
+const express = require('express');
+const fs = require('fs');
+const crypto = require('crypto');
+const cc = require('config-multipaas');
+const http = require('http');
+const https = require('https');
+const path = require('path');
+const mkdirp = require('mkdirp');
+const request = require('request');
+const app = express();
 var tls = {};
 try{
   tls = {
@@ -24,15 +24,15 @@ try{
   // fallback to http/ws connections
   console.log("protocol: http/ws")
 }
-var protocol = ( Object.keys(tls).length != 0 ) ? https : http;
-var server = protocol.createServer(tls, app);
-var io = require('socket.io')(server);
-var sanitizeHtml = require('sanitize-html');
-var rate_limit_slides = require('./rate_limit_response.json');
-var default_slides = require('./default_response.json');
-var error_slides = require('./error_response.json');
-var local_slide_resp = require('./local_slides.json');
-var sanitize = function(slideshow_content){
+const protocol = ( Object.keys(tls).length != 0 ) ? https : http;
+const server = protocol.createServer(tls, app);
+const io = require('socket.io')(server);
+const sanitizeHtml = require('sanitize-html');
+const rate_limit_slides = require('./rate_limit_response.json');
+const default_slides = require('./default_response.json');
+const error_slides = require('./error_response.json');
+const local_slide_resp = require('./local_slides.json');
+const sanitize = function(slideshow_content){
   return sanitizeHtml(slideshow_content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote']),
     allowedAttributes: {

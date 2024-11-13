@@ -3,6 +3,7 @@ if(Reveal.getConfig().hosted){
     var hosted = Reveal.getConfig().hosted;
     var socket = io.connect(document.location.protocol+'//'+document.location.host);
     var socketId = hosted.id;
+    var gist_id = document.head.getElementsByTagName('meta')[4].content;
 
     //Persist presenter token when supplied via hash:
     if ( window.location.search.search( /\?setToken=[^ ]/i ) == 0){ 
@@ -12,12 +13,14 @@ if(Reveal.getConfig().hosted){
     }
 
     if ( typeof(localStorage.secret) == "undefined" || localStorage.secret == null) {
-        console.log('Tuning in for the presentation...');
+        console.log('Tuning in for gist: ' + gist_id);
 
         socket.on(hosted.id, function(data) {
           console.dir(data);
         	// ignore data from sockets that aren't ours
         	if (data.socketId !== socketId) { return; }
+		// ignore data from slides that aren't ours
+		if (data.gistId !== gist_id) { return; }
           if( data.indexh !== undefined && data.indexv !== undefined){
            	Reveal.slide(data.indexh, data.indexv, null, 'remote');
           }else{
@@ -33,13 +36,14 @@ if(Reveal.getConfig().hosted){
           localStorage.clear();
           window.location.search = '';
         }
-        console.log('Broadcasting slides...');
+        console.log('Broadcasting slide: ' + gist_id);
 
         Reveal.addEventListener( 'fragmentshown', function( event ) {
           console.dir(event);
         	var data = {
         		secret: localStorage.secret,
-        		socketId : hosted.id,
+            gistId: gist_id,
+            socketId : hosted.id,
             direction: 'next'
         	};
         	if( typeof event.origin === 'undefined' && event.origin !== 'remote' ) socket.emit('navigation', data);
@@ -49,7 +53,8 @@ if(Reveal.getConfig().hosted){
           console.dir(event);
         	var data = {
         		secret: localStorage.secret,
-        		socketId : hosted.id,
+			gistId: gist_id,
+			socketId : hosted.id,
             direction: 'prev'
         	};
         	if( typeof event.origin === 'undefined' && event.origin !== 'remote' ) socket.emit('navigation', data);
@@ -75,7 +80,8 @@ if(Reveal.getConfig().hosted){
         		nextindexh : nextindexh,
         		nextindexv : nextindexv,
         		secret: localStorage.secret,
-        		socketId : hosted.id
+			socketId : hosted.id,
+			gistId: gist_id
         	};
 
         	if( typeof event.origin === 'undefined' && event.origin !== 'remote' ) socket.emit('slidechanged', slideData);

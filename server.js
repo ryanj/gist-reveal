@@ -185,7 +185,7 @@ var get_theme = function(gist_id, cb) {
           cb('gists/'+gist_id+'/'+gist_id)
         }else{
           //not found
-          console.log("gist not found");
+          console.log("gist not found: " + gist_id);
           cb(gist_id)
         }
       })

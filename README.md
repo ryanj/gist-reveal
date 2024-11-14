@@ -78,10 +78,10 @@ Gist-reveal makes it easy to run your own Gist-powered RevealJS slideshow servic
 The simplest way to get started with this project, is to clone a copy of the source from github (`git clone http://github.com/ryanj/gist-reveal && cd gist-reveal`), then run the app locally with `npm install` followed by `npm start`.
 
 ### Kubernetes 
-To create a kubernetes `deployment` and `NodePort` `service`, both named `gist-reveal`:
+Create a kubernetes `pod` and `service`, both named `gist-reveal`:
 
 ```bash
-kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 --service-overrides='{ "spec": { "type": "NodePort" } }' \
+kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 \
 --env="DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" \
 --env="GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET" \
 --env="GH_CLIENT_ID=YOUR_GH_CLIENT_ID" \
@@ -89,22 +89,18 @@ kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 --service
 --env="GA_TRACKER=YOUR_GA_TRACKER"
 ```
 
-Minikube users should be able to open the new service in their browser by running:
+### Podman or Docker
 
-    minikube service gist-reveal
-
-### Docker 
-
-To run [the docker image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
+Run [the container image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
 
 ```bash
-docker run --rm -p 8080:8080 docker.io/ryanj/gist-reveal
+podman run --rm -p 8080:8080 ryanj/gist-reveal
 ```
 
-[Environment variables](#Application_Config) can be passed into the Docker container in order to configure the websocket relay, or to change the default slideshow content: 
+[Environment variables](#Application_Config) can be passed into the container to configure the websocket relay, or to change the default slideshow content: 
 
 ```bash
-docker run --rm -p 8080:8080 -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
+podman run --rm -p 8080:8080 -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal
 ```
 
 ## License

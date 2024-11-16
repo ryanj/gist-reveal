@@ -1,14 +1,25 @@
-const express = require('express');
-const fs = require('fs');
-const crypto = require('crypto');
-const cc = require('config-multipaas');
-const http = require('http');
-const https = require('https');
-const path = require('path');
-const mkdirp = require('mkdirp');
-const request = require('request');
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import express from 'express';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
+import cc from 'config-multipaas';
+import * as http from 'http';
+import * as https from 'https';
+import * as path from 'path';
+import * as mkdirp from 'mkdirp';
+import ye_olde_request from 'request';
+import socketIo from "socket.io";
+import sanitizeHtml from "sanitize-html";
+import rate_limit_slides from "./rate_limit_response.json" with { type: "json" };
+import default_slides from "./default_response.json" with { type: "json" };
+import error_slides from "./error_response.json" with { type: "json" };
+import local_slide_resp from "./local_slides.json" with { type: "json" };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
-var tls = {};
+let tls = {};
 try{
   tls = {
     key: process.env['PRIVATE_KEY'] || fs.readFileSync(__dirname + '/private.key', 'utf8'),
@@ -26,13 +37,8 @@ try{
 }
 const protocol = ( Object.keys(tls).length != 0 ) ? https : http;
 const server = protocol.createServer(tls, app);
-const io = require('socket.io')(server);
-const sanitizeHtml = require('sanitize-html');
-const rate_limit_slides = require('./rate_limit_response.json');
-const default_slides = require('./default_response.json');
-const error_slides = require('./error_response.json');
-const local_slide_resp = require('./local_slides.json');
-const sanitize = function(slideshow_content){
+let io = new socketIo(server);
+const sanitize = (slideshow_content) => {
   return sanitizeHtml(slideshow_content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote']),
     allowedAttributes: {
@@ -67,18 +73,17 @@ const sanitize = function(slideshow_content){
 })}
 
 // needs gc, max size = 25?
-var bitly_short_names = [];
-var bitly_gist_ids = [];
+let bitly_short_names = [];
+let bitly_gist_ids = [];
 
-var config = cc({
+let config = cc({
   REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
 , WEBSOCKET_ENABLED : process.env.WEBSOCKET_ENABLED || "true"
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
 , REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
 , DEBUG : Number(process.env.DEBUG) || 0
 , GIST_THEMES : process.env.GIST_THEMES || "true"
-, GH_CLIENT_ID : process.env.GH_CLIENT_ID
-, GH_CLIENT_SECRET : process.env.GH_CLIENT_SECRET
+, GH_CLIENT_TOKEN : process.env.GH_CLIENT_TOKEN
 , GA_TRACKER : process.env.GA_TRACKER
 , REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
 , GIST_PATH : process.env.GIST_PATH || __dirname || '.'
@@ -90,12 +95,12 @@ var config = cc({
 , TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presented_by/"
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
-var createHash = function(secret) {
-	var cipher = crypto.createHash('md5').update(secret);
+const createHash = (secret) => {
+	let cipher = crypto.createHash('md5').update(secret);
 	return(cipher.digest('hex'));
 };
-var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
-var ga_tracker_html = function(tracker_id){
+const presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
+const ga_tracker_html = (tracker_id) => {
   if(typeof(tracker_id) !== 'undefined'){
     return "<!-- Google tag (gtag.js) -->\n"+
     "<script async src='https://www.googletagmanager.com/gtag/js?id="+tracker_id+"'></script>\n"+
@@ -110,8 +115,8 @@ var ga_tracker_html = function(tracker_id){
   }
 };
 
-var render_slideshow = function(gist, theme, cb) {
-  for(var i in gist.files){
+const render_slideshow = (gist, theme, cb) => {
+  for(let i in gist.files){
     if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
       var title = sanitize(i);
       var slides = sanitize(gist.files[i].content);
@@ -120,7 +125,7 @@ var render_slideshow = function(gist, theme, cb) {
       break;
     }
   }
-  get_theme(theme, function(themename){
+  get_theme(theme, (themename) => {
     var index = cb( fs.readFileSync( __dirname + '/index.html').toString()
                            .replace(/\{\{slides}}/, slides)
                            .replace(/hosted: {}/, getClientConfig())
@@ -141,7 +146,7 @@ var render_slideshow = function(gist, theme, cb) {
   });
 };
 
-var install_theme = function(gist){
+const install_theme = (gist) => {
   var title, data;
   var theme_folder = path.resolve('css','theme','gists',gist.id);
   console.log("installing gist: "+gist.id);
@@ -151,32 +156,32 @@ var install_theme = function(gist){
     data = gist.files[i].content;
     if( gist.files[i].type == "text/css"){
       filename = path.resolve('css','theme','gists',gist.id,gist.id+".css")
-      fs.writeFile(filename, data, function(err){
+      fs.writeFile(filename, data, (err) => {
         console.log('theme installed: '+gist.id);
       });
     }else{
       filename = path.resolve('css','theme','gists',gist.id,filenm)
-      request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', function(err) {
+      ye_olde_request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', (err) => {
           console.log(err)
       })
     }
   }
 }
 
-var get_theme = function(gist_id, cb) {
+const get_theme = (gist_id, cb) => {
   if( !config.get('GIST_THEMES') ){
     // if theme installation is disabled, return immediately
     cb(gist_id)
   }
   var theme_folder = path.resolve( 'css','theme', 'gists', gist_id );
   //if theme is found locally, return gist_id;
-  fs.stat( theme_folder, function(err, stats){
+  fs.stat( theme_folder, (err, stats) => {
     if(!err){
       //console.log("not installing locally available theme: " + gist_id);
       cb('gists/'+gist_id+'/'+gist_id);
     }else{
       //console.log("installing css theme: " + gist_id);
-      get_gist(gist_id, function(error, response, api_response){
+      get_gist(gist_id, (error, response, api_response) => {
         //cache the content
         if (!error && response.statusCode == 200) {
           gist = JSON.parse(api_response);
@@ -193,8 +198,7 @@ var get_theme = function(gist_id, cb) {
   })
 }
 
-var svgtemplate = function (req, res, next)
-{
+const svgtemplate = (req, res, next) => {
   var presenter_name = req.params.username || 'gist-reveal';
   //var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
   //console.log('button: {text: "'+presenter_name+'"}')
@@ -204,9 +208,9 @@ var svgtemplate = function (req, res, next)
   res.end(presented_by.toString().replace(/gist-reveal/, "@"+presenter_name));
 };
 
-var concurrency = 0;
+let concurrency = 0;
 
-var get_bitlink = function(req, res, next) {
+const get_bitlink = (req, res, next) => {
   var short_name = req.params.short_name || req.query.short_name;
   var payload_id,payload_offset,id_start,payload_end;
   var payload_identifier="<meta name=\"gist_id\" content=\"";
@@ -221,8 +225,8 @@ var get_bitlink = function(req, res, next) {
   } else {
 
     console.log('looking up bitlink: http://bit.ly/' + short_name );
-    request({url: "http://bit.ly/"+short_name },
-      function(error, response, payload){
+    ye_olde_request({url: "http://bit.ly/"+short_name },
+      (error, response, payload) => {
         if (!error && response.statusCode == 200) {
           payload_offset = payload.indexOf(payload_identifier)
           id_start = payload_offset+payload_identifier.length;
@@ -249,7 +253,7 @@ var get_bitlink = function(req, res, next) {
   }
 };
 
-var get_local_slides = function(cb){
+const get_local_slides = (cb) => {
   var path = config.get('GIST_PATH');
   var filename = config.get('GIST_FILENAME');
   var escaped=filename.replace(/\//g, "//").replace(/'/g, "\'").replace(/"/g, '\"'); 
@@ -258,7 +262,7 @@ var get_local_slides = function(cb){
   local_slide_resp.files=filejson;
   
   //look up local file, inject it into the template
-  fs.readFile(path+'/'+filename, function( error, local_content ){
+  fs.readFile(path+'/'+filename, ( error, local_content ) => {
     if(error){
       local_slide_resp.files[escaped].content="<section>"+error+"</section>"
     }else{
@@ -268,9 +272,10 @@ var get_local_slides = function(cb){
   })
 }
 
-var get_slides = function(req, res, next) {
+const get_slides = (req, res, next) => {
   var theme = req.query['theme'] || config.get('REVEAL_THEME');
   var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
+  var gist = {};
   if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') == -1 ){
     //console.log("redirecting to: /bit.ly/" + bitly_gist_ids[gist_id]);
     if( req.query['theme'] ){
@@ -279,14 +284,14 @@ var get_slides = function(req, res, next) {
       res.redirect("/bit.ly/"+bitly_gist_ids[gist_id]);
     }
   }else if( config.get('GIST_FILENAME')){
-    get_local_slides(function(gist){
-      render_slideshow(gist, theme, function(slides){
+    get_local_slides( (gist) => {
+      render_slideshow(gist, theme, (slides) => {
         res.send(slides);
         //return next();
       });
     });
   }else{
-    get_gist(gist_id, function (error, response, api_response) {
+    get_gist(gist_id, (error, response, api_response) => {
       if (!error && response.statusCode == 200) {
         gist = JSON.parse(api_response);
       }else if (response.statusCode == 403){
@@ -294,7 +299,7 @@ var get_slides = function(req, res, next) {
       }else{
         gist = error_slides;
       }
-      render_slideshow(gist, theme, function(slides){
+      render_slideshow(gist, theme, (slides) => {
         res.send(slides);
         //return next();
       });
@@ -302,32 +307,35 @@ var get_slides = function(req, res, next) {
   }
 }
 
-var get_gist = function(gist_id, cb) {
+const get_gist = (gist_id, cb) => {
   var gist_api_url = "https://api.github.com/gists/";
   // hits rate limits quickly when auth is omitted
-  var authentication = ""; 
-  if( typeof config.get('GH_CLIENT_SECRET') !== "undefined" && config.get('GH_CLIENT_SECRET') !== "" &&
-      typeof config.get('GH_CLIENT_ID')     !== "undefined" && config.get('GH_CLIENT_ID') !== "" ){
-    authentication = "?client_id="+config.get('GH_CLIENT_ID')+"&client_secret="+config.get('GH_CLIENT_SECRET');
+  var headers = {
+    'Accept': 'application/vnd.github+json',
+    'User-Agent': "ryanj",
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  if( typeof config.get('GH_CLIENT_TOKEN') !== "undefined" && config.get('GH_CLIENT_TOKEN') !== "" ){
+    headers.Authorization = 'Bearer '+config.get('GH_CLIENT_TOKEN');
   }
-  request({
-    url: gist_api_url + gist_id + authentication, 
-    headers: {'User-Agent': 'request'}
-  }, cb)
+
+  ye_olde_request({
+    url: gist_api_url + gist_id,
+    headers: headers
+  }, cb);
 }
 
-
-app.get("/token", function(req,res) {
+app.get("/token", (req,res) => {
   res.send('Information about setting up your presentation environment is available in the server logs');
 });
 
 if(config.get('WEBSOCKET_ENABLED') !== "false"){ 
-  io.on('connection', function(socket) {
+  io.on('connection', (socket) => {
     concurrency = concurrency+1;
     if(config.get('DEBUG') >= 2){
       console.log("Concurrency: " + concurrency)
     }
-    var checkAndReflect = function(data){
+    var checkAndReflect = (data) => {
       if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
       if (createHash(data.secret) === data.socketId) {
         data.secret = null; 
@@ -340,7 +348,7 @@ if(config.get('WEBSOCKET_ENABLED') !== "false"){
     };
     socket.on('slidechanged', checkAndReflect);
     socket.on('navigation', checkAndReflect);
-    socket.on('disconnect', function(){
+    socket.on('disconnect', () => {
       concurrency = concurrency -1;
       if(config.get('DEBUG') >= 2){
         console.log("Concurrency: " + concurrency)
@@ -349,14 +357,14 @@ if(config.get('WEBSOCKET_ENABLED') !== "false"){
   });
 }
 
-var getTokens = function(){
+const getTokens = () => {
   var secret = config.get('REVEAL_SOCKET_SECRET');
   var socket = createHash(secret);
   response = {"socket_secret": secret, "socket_id": socket};
   return response;
 };
 
-var getClientConfig = function(){
+const getClientConfig = () => {
   var tokens = getTokens();
   if(config.get('WEBSOCKET_ENABLED') == "false"){
     return "hosted: false";
@@ -364,7 +372,7 @@ var getClientConfig = function(){
   return "hosted:{ id: '"+tokens.socket_id+"' }";
 };
 app.get("/", get_slides);
-app.get("/status", function(req,res,next) {
+app.get("/status", (req,res,next) => {
   return res.send('ok');
 });
 
@@ -384,10 +392,6 @@ app.get("/bit\.ly/:short_name", get_bitlink);
 app.get("/:gist_id", get_slides);
 
 // Actually listen
-server.listen(config.get('PORT'), config.get('IP'), function(){
-  var brown = '\033[33m',
-      green = '\033[32m',
-      reset = '\033[0m';
-
-  console.log( brown + "reveal.js:" + reset + " Multiplex running on "+config.get('IP')+":" + green + config.get('PORT') + reset );
+server.listen(config.get('PORT'), config.get('IP'), () => {
+  console.log( "reveal.js: Multiplex running on "+config.get('IP')+":" + config.get('PORT') );
 });

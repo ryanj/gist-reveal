@@ -97,7 +97,7 @@ Run [the container image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) 
 podman run --rm -p 8080:8080 ryanj/gist-reveal
 ```
 
-[Environment variables](#Application_Config) can be passed into the container to configure the websocket relay, or to change the default slideshow content: 
+[Environment variables](#application-config) can be passed into the container to configure the websocket relay, or to change the default slideshow content:
 
 ```bash
 podman run --rm -p 8080:8080 -e "REVEAL_SOCKET_SECRET=0P3N-S0URC3" -e "DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" ryanj/gist-reveal

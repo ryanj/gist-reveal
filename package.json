@@ -1,11 +1,11 @@
 {
   "name": "gist-reveal",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Gist-powered Reveal.js slides",
   "homepage": "http://gist-reveal.it",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "build": "npm run build-js",
     "build-js": "cat node_modules/reveal.js/lib/js/head.min.js js/reveal.js > js/reveal-bundle.js"
   },
@@ -24,11 +24,12 @@
   "dependencies": {
     "config-multipaas": "^0.2.2",
     "express": "4.21.1",
-    "request": "2.88.2",
     "mkdirp": "^0.5.6",
+    "request": "2.88.2",
     "reveal.js": "3.6.0",
     "sanitize-html": "2.13.1",
     "socket.io": "2.5.0"
   },
+  "type": "module",
   "license": "MIT"
 }

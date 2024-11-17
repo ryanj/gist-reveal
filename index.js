@@ -83,7 +83,7 @@ let config = cc({
 , REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
 , DEBUG : Number(process.env.DEBUG) || 0
 , GIST_THEMES : process.env.GIST_THEMES || "true"
-, GH_CLIENT_TOKEN : process.env.GH_CLIENT_TOKEN
+, GH_API_TOKEN : process.env.GH_API_TOKEN
 , GA_TRACKER : process.env.GA_TRACKER
 , REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
 , GIST_PATH : process.env.GIST_PATH || __dirname || '.'
@@ -315,8 +315,8 @@ const get_gist = (gist_id, cb) => {
     'User-Agent': "gist-reveal.it",
     'X-GitHub-Api-Version': '2022-11-28'
   };
-  if( typeof config.get('GH_CLIENT_TOKEN') !== "undefined" && config.get('GH_CLIENT_TOKEN') !== "" ){
-    headers.Authorization = 'Bearer '+config.get('GH_CLIENT_TOKEN');
+  if( typeof config.get('GH_API_TOKEN') !== "undefined" && config.get('GH_API_TOKEN') !== "" ){
+    headers.Authorization = 'Bearer '+config.get('GH_API_TOKEN');
   }
 
   ye_olde_request({

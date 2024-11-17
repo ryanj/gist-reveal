@@ -48,7 +48,7 @@ Variable Name  | Contents   |  Default Value
 ---------------|------------|---------------
 DEFAULT_GIST   | The default gist id slideshow content for the site | [af84d40e58c5c2a908dd](https://gist.github.com/ryanj/af84d40e58c5c2a908dd)
 REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | [450836bbaebcf4c4ae08b331343a7886](https://gist.github.com/ryanj/450836bbaebcf4c4ae08b331343a7886) 
-GH_CLIENT_TOKEN | GitHub client token | unset
+GH_API_TOKEN | GitHub API token | unset
 GA_TRACKER | Google Analytics tracker token | unset
 PORT | The server port number | 8080
 IP_ADDR | The server IP address | 0.0.0.0
@@ -82,7 +82,7 @@ Create a kubernetes `pod` and `service`, both named `gist-reveal`:
 ```bash
 kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 \
 --env="DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" \
---env="GH_CLIENT_TOKEN=YOUR_GH_CLIENT_TOKEN" \
+--env="GH_API_TOKEN=YOUR_GH_API_TOKEN" \
 --env="REVEAL_SOCKET_SECRET=0P3N-S0URC3" \
 --env="GA_TRACKER=YOUR_GA_TRACKER"
 ```

@@ -89,7 +89,7 @@ kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 \
 
 ### Podman or Docker
 
-Run [the container image](https://registry.hub.docker.com/u/ryanj/gist-reveal/) locally on port `8080`:
+Run the [container image](https://registry.hub.docker.com/r/ryanj/gist-reveal) locally on port `8080`:
 
 ```bash
 podman run --rm -p 8080:8080 ryanj/gist-reveal

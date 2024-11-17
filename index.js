@@ -312,7 +312,7 @@ const get_gist = (gist_id, cb) => {
   // hits rate limits quickly when auth is omitted
   var headers = {
     'Accept': 'application/vnd.github+json',
-    'User-Agent': "ryanj",
+    'User-Agent': "gist-reveal.it",
     'X-GitHub-Api-Version': '2022-11-28'
   };
   if( typeof config.get('GH_CLIENT_TOKEN') !== "undefined" && config.get('GH_CLIENT_TOKEN') !== "" ){

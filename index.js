@@ -7,7 +7,7 @@ import cc from 'config-multipaas';
 import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
-import * as mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import ye_olde_request from 'request';
 import socketIo from "socket.io";
 import sanitizeHtml from "sanitize-html";
@@ -147,10 +147,13 @@ const render_slideshow = (gist, theme, cb) => {
 };
 
 const install_theme = (gist) => {
-  var title, data;
-  var theme_folder = path.resolve('css','theme','gists',gist.id);
+  let title, data;
+  let theme_folder = path.resolve('css','theme','gists',gist.id);
+  let filenm = '';
+  let filename = '';
   console.log("installing gist: "+gist.id);
-  mkdirp(theme_folder);
+  mkdirp.sync(theme_folder);
+
   for(var i in gist.files){
     filenm = gist.files[i].filename;
     data = gist.files[i].content;
@@ -162,7 +165,7 @@ const install_theme = (gist) => {
     }else{
       filename = path.resolve('css','theme','gists',gist.id,filenm)
       ye_olde_request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', (err) => {
-          console.log(err)
+        console.log(err)
       })
     }
   }
@@ -174,6 +177,7 @@ const get_theme = (gist_id, cb) => {
     cb(gist_id)
   }
   var theme_folder = path.resolve( 'css','theme', 'gists', gist_id );
+  let gist = {};
   //if theme is found locally, return gist_id;
   fs.stat( theme_folder, (err, stats) => {
     if(!err){

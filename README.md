@@ -48,15 +48,14 @@ Variable Name  | Contents   |  Default Value
 ---------------|------------|---------------
 DEFAULT_GIST   | The default gist id slideshow content for the site | [af84d40e58c5c2a908dd](https://gist.github.com/ryanj/af84d40e58c5c2a908dd)
 REVEAL_THEME | The site's default theme. Should be a locally bundled theme name, or a remote gist_id. | [450836bbaebcf4c4ae08b331343a7886](https://gist.github.com/ryanj/450836bbaebcf4c4ae08b331343a7886) 
-GH_CLIENT_SECRET | GitHub client secret | unset
-GH_CLIENT_ID | GitHub client ID | unset
+GH_CLIENT_TOKEN | GitHub client token | unset
 GA_TRACKER | Google Analytics tracker token | unset
 PORT | The server port number | 8080
 IP_ADDR | The server IP address | 0.0.0.0
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically "url/?theme=gist_id". Disable this feature by setting this config to the string "false". | "true"
 REVEAL_SOCKET_SECRET | the site's broadcast token (alphanumeric) | randomly generated
 
-See [`server.js`](https://github.com/ryanj/gist-reveal/blob/master/server.js#L55-L70) for more information about the site's configuration options.
+See [`index.js`](https://github.com/ryanj/gist-reveal/blob/master/index.js#L55-L70) for more information about the site's configuration options.
 
 ### Broadcasting Slide Transitions
 
@@ -83,8 +82,7 @@ Create a kubernetes `pod` and `service`, both named `gist-reveal`:
 ```bash
 kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 \
 --env="DEFAULT_GIST=YOUR_DEFAULT_GIST_ID" \
---env="GH_CLIENT_SECRET=YOUR_GH_CLIENT_SECRET" \
---env="GH_CLIENT_ID=YOUR_GH_CLIENT_ID" \
+--env="GH_CLIENT_TOKEN=YOUR_GH_CLIENT_TOKEN" \
 --env="REVEAL_SOCKET_SECRET=0P3N-S0URC3" \
 --env="GA_TRACKER=YOUR_GA_TRACKER"
 ```

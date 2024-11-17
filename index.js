@@ -11,10 +11,10 @@ import * as mkdirp from 'mkdirp';
 import ye_olde_request from 'request';
 import socketIo from "socket.io";
 import sanitizeHtml from "sanitize-html";
-import rate_limit_slides from "./rate_limit_response.json" with { type: "json" };
-import default_slides from "./default_response.json" with { type: "json" };
-import error_slides from "./error_response.json" with { type: "json" };
-import local_slide_resp from "./local_slides.json" with { type: "json" };
+const rate_limit_slides = JSON.parse(fs.readFileSync('./rate_limit_response.json'));
+const default_slides = JSON.parse(fs.readFileSync('./default_response.json'));
+const error_slides = JSON.parse(fs.readFileSync('./error_response.json'));
+const local_slide_resp = JSON.parse(fs.readFileSync('./local_slides.json'));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

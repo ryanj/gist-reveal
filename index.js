@@ -11,13 +11,13 @@ import { mkdirp } from 'mkdirp';
 import ye_olde_request from 'request';
 import socketIo from "socket.io";
 import sanitizeHtml from "sanitize-html";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const rate_limit_slides = JSON.parse(fs.readFileSync('./rate_limit_response.json'));
 const default_slides = JSON.parse(fs.readFileSync('./default_response.json'));
 const error_slides = JSON.parse(fs.readFileSync('./error_response.json'));
 const local_slide_resp = JSON.parse(fs.readFileSync('./local_slides.json'));
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const app = express();
 let tls = {};
 try{
@@ -147,44 +147,74 @@ const render_slideshow = (gist, theme, cb) => {
 };
 
 const install_theme = (gist) => {
-  let title, data;
-  let theme_folder = path.resolve('css','theme','gists',gist.id);
+  let data, theme_folder;
+  if(process.env.NODE_ENV == "production"){
+    theme_folder = path.resolve('/','tmp','gists',gist.id);
+  }else{
+    theme_folder = path.resolve('css','theme','gists',gist.id);
+  }
   let filenm = '';
   let filename = '';
   console.log("installing gist: "+gist.id);
-  mkdirp.sync(theme_folder);
-
-  for(var i in gist.files){
-    filenm = gist.files[i].filename;
-    data = gist.files[i].content;
-    if( gist.files[i].type == "text/css"){
-      filename = path.resolve('css','theme','gists',gist.id,gist.id+".css")
-      fs.writeFile(filename, data, (err) => {
-        console.log('theme installed: '+gist.id);
-      });
-    }else{
-      filename = path.resolve('css','theme','gists',gist.id,filenm)
-      ye_olde_request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', (err) => {
-        console.log(err)
-      })
-    }
+  try{
+    fs.mkdir(theme_folder, {recursive: true}, function(errs){
+      if(errs){
+        console.error(errs);
+      };
+      for(let i in gist.files){
+        filenm = gist.files[i].filename;
+        data = gist.files[i].content;
+        if( gist.files[i].type == "text/css"){
+          if(process.env.NODE_ENV == "production"){
+            filename = path.resolve('/','tmp','gists',gist.id,gist.id+".css")
+          }else{
+            filename = path.resolve('css','theme','gists',gist.id,gist.id+".css")
+          }
+          fs.writeFile(filename, data, (err) => {
+            if(err){
+              console.error(err);
+            }else{
+              console.log('theme installed: '+gist.id);
+              //console.log('theme installed: '+filename);
+            }
+          });
+        }else{
+          if(process.env.NODE_ENV == "production"){
+            filename = path.resolve('/','tmp','gists',gist.id,filenm)
+          }else{
+            filename = path.resolve('css','theme','gists',gist.id,filenm)
+          }
+          ye_olde_request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', (err) => {
+            console.error(err)
+          })
+        }
+      }
+    });
+  } catch (err){
+    console.log("fail to install: "+gist.id);
+    console.error(err);
   }
 }
 
 const get_theme = (gist_id, cb) => {
+  let theme_folder;
   if( !config.get('GIST_THEMES') ){
     // if theme installation is disabled, return immediately
     cb(gist_id)
   }
-  var theme_folder = path.resolve( 'css','theme', 'gists', gist_id );
+  if(process.env.NODE_ENV == "production"){
+    theme_folder = path.resolve( '/','tmp', 'gists', gist_id );
+  }else{
+    theme_folder = path.resolve( 'css','theme', 'gists', gist_id );
+  }
   let gist = {};
   //if theme is found locally, return gist_id;
   fs.stat( theme_folder, (err, stats) => {
     if(!err){
-      //console.log("not installing locally available theme: " + gist_id);
+      //console.log("cached theme: " + gist_id);
       cb('gists/'+gist_id+'/'+gist_id);
     }else{
-      //console.log("installing css theme: " + gist_id);
+      //console.log("new theme: " + gist_id);
       get_gist(gist_id, (error, response, api_response) => {
         //cache the content
         if (!error && response.statusCode == 200) {
@@ -193,8 +223,9 @@ const get_theme = (gist_id, cb) => {
           console.log("gist retrieved : " + gist_id);
           cb('gists/'+gist_id+'/'+gist_id)
         }else{
-          //not found
-          console.log("gist not found: " + gist_id);
+          if(config.get('DEBUG') >= 2){
+            console.log("theme not found by id: " + gist_id);
+          }
           cb(gist_id)
         }
       })
@@ -203,7 +234,7 @@ const get_theme = (gist_id, cb) => {
 }
 
 const svgtemplate = (req, res, next) => {
-  var presenter_name = req.params.username || 'gist-reveal';
+  const presenter_name = req.params.username || 'gist-reveal';
   //var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
   //console.log('button: {text: "'+presenter_name+'"}')
   //console.log("request url:" + req.url)
@@ -381,6 +412,11 @@ app.get("/status", (req,res,next) => {
 });
 
 // Static files:
+if(process.env.NODE_ENV == 'production'){
+  app.use('/css/theme/gists', express.static('/tmp/gists'));
+}else{
+  app.use('/css/theme/gists', express.static(path.resolve(__dirname,'css','theme','gists')));
+}
 app.use(express.static(__dirname))
 
 // SVG templating

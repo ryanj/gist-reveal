@@ -16,31 +16,32 @@ if(Reveal.getConfig().hosted){
         window.location = document.location.protocol+'//'+document.location.host;
     }
 
-    if ( typeof(localStorage.secret) == "undefined" || localStorage.secret == null) {
-        console.log('Tuning in for gist: ' + gist_id);
-        socket.emit('listen', {
-          gistId: gist_id,
-          socketId : hosted.id
-        });
+    socket.on(hosted.id, function(data) {
+      // ignore data from sockets that aren't ours
+      if (data.socketId !== socketId) { return; }
+      // ignore data from slides that aren't ours
+      if (data.gistId !== gist_id) { return; }
+      if( data.indexh !== undefined && data.indexv !== undefined){
+            Reveal.slide(data.indexh, data.indexv, null, 'remote');
+      }else{
+        if(data.direction == 'next'){
+          Reveal.nextFragment();
+        }else{
+          Reveal.prevFragment();
+        }
+      }
+    });
 
-        socket.on(hosted.id, function(data) {
-          console.dir(data);
-        	// ignore data from sockets that aren't ours
-        	if (data.socketId !== socketId) { return; }
-		// ignore data from slides that aren't ours
-		if (data.gistId !== gist_id) { return; }
-          if( data.indexh !== undefined && data.indexv !== undefined){
-           	Reveal.slide(data.indexh, data.indexv, null, 'remote');
-          }else{
-            if(data.direction == 'next'){
-              Reveal.nextFragment();
-            }else{
-              Reveal.prevFragment();
-            }
-          }
-        });
+    if ( typeof(localStorage.secret) == "undefined" || localStorage.secret == null) {
+      console.log('Tuning in for gist: ' + gist_id);
+      socket.emit('listen', {
+        gistId: gist_id,
+        socketId : hosted.id
+      });
     }else{
-        console.log('Broadcasting slide: ' + gist_id);
+        console.log('WARNING: Broadcasting is restricted to gist owners. Not the owner? Fork the gist and load your resulting gist id to share your slide transitions');
+        console.log('Only the gist owner can broadcast slide: ' + gist_id);
+        console.log('Visit /logout when you are finished presenting');
         socket.emit('presentation_auth', {
           secret: localStorage.secret,
           gistId: gist_id,

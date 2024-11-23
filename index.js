@@ -438,7 +438,7 @@ if(config.get('WEBSOCKET_ENABLED') !== "false" &&
         socket.to(data.gistId).emit(data.socketId, data);
         //console.dir(data);
       }else{
-        console.log('Discarding mismatched socket data:');
+        console.log('Discarding mismatched socket data: '+data.gistId);
         //console.dir(data);
       };      
     };
@@ -463,6 +463,8 @@ if(config.get('WEBSOCKET_ENABLED') !== "false" &&
                 // else listen
                 //socket.emit('listen');
               }
+            }else{
+              console.log("Auth failed");
             }
           }
         });

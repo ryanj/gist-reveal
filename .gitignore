@@ -1,6 +1,10 @@
 .DS_Store
 .svn
+.env
 log/*.log
+public.crt
+private.key
 tmp/**
 node_modules/
 .sass-cache
+css/theme/gists/*

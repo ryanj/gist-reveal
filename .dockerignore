@@ -1,0 +1,7 @@
+node_modules
+css/theme/gists/*
+public.crt
+private.key
+.git
+.gitignore
+.env

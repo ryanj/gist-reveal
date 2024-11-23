@@ -1,5 +1,9 @@
 (function() {
 if(Reveal.getConfig().hosted){
+    if ( window.location.search.search( /\?clearToken/i ) >= 0){
+      localStorage.clear();
+      window.location = document.location.protocol+'//'+document.location.host;
+    }
     var hosted = Reveal.getConfig().hosted;
     var socket = io.connect(document.location.protocol+'//'+document.location.host);
     var socketId = hosted.id;
@@ -9,11 +13,15 @@ if(Reveal.getConfig().hosted){
     if ( window.location.search.search( /\?setToken=[^ ]/i ) == 0){ 
         console.log('Persisting presenter token');
         localStorage.secret = window.location.search.slice(10);
-        window.location.search = '';
+        window.location = document.location.protocol+'//'+document.location.host;
     }
 
     if ( typeof(localStorage.secret) == "undefined" || localStorage.secret == null) {
         console.log('Tuning in for gist: ' + gist_id);
+        socket.emit('listen', {
+          gistId: gist_id,
+          socketId : hosted.id
+        });
 
         socket.on(hosted.id, function(data) {
           console.dir(data);
@@ -32,11 +40,12 @@ if(Reveal.getConfig().hosted){
           }
         });
     }else{
-        if ( window.location.search.search( /\?clearToken/i ) >= 0){
-          localStorage.clear();
-          window.location.search = '';
-        }
         console.log('Broadcasting slide: ' + gist_id);
+        socket.emit('presentation_auth', {
+          secret: localStorage.secret,
+          gistId: gist_id,
+          socketId : hosted.id
+        });
 
         Reveal.addEventListener( 'fragmentshown', function( event ) {
           console.dir(event);

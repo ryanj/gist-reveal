@@ -1,13 +1,11 @@
 {
   "name": "gist-reveal",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Gist-powered Reveal.js slides",
   "homepage": "http://gist-reveal.it",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "npm run build-js",
-    "build-js": "cat node_modules/reveal.js/lib/js/head.min.js js/reveal.js > js/reveal-bundle.js"
+    "start": "node index.js"
   },
   "author": {
     "name": "ryanj",
@@ -26,9 +24,9 @@
     "express": "4.21.1",
     "mkdirp": "^3.0.1",
     "request": "2.88.2",
-    "reveal.js": "3.6.0",
+    "reveal.js": "5.1.0",
     "sanitize-html": "2.13.1",
-    "socket.io": "2.5.0"
+    "socket.io": "4.8.1"
   },
   "type": "module",
   "license": "MIT"

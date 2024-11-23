@@ -1,5 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { mkdirp } from 'mkdirp';
+import { Server } from "socket.io";
 import express from 'express';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
@@ -7,15 +9,13 @@ import cc from 'config-multipaas';
 import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
-import { mkdirp } from 'mkdirp';
 import ye_olde_request from 'request';
-import socketIo from "socket.io";
 import sanitizeHtml from "sanitize-html";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rate_limit_slides = JSON.parse(fs.readFileSync('./rate_limit_response.json'));
-const default_slides = JSON.parse(fs.readFileSync('./default_response.json'));
-const error_slides = JSON.parse(fs.readFileSync('./error_response.json'));
+const rate_limit_slides = JSON.parse(fs.readFileSync('./responses/rate_limit_response.json'));
+const default_slides = JSON.parse(fs.readFileSync('./responses/default_response.json'));
+const error_slides = JSON.parse(fs.readFileSync('./responses/error_response.json'));
 const local_slide_resp = JSON.parse(fs.readFileSync('./local_slides.json'));
 
 const app = express();
@@ -37,53 +37,22 @@ try{
 }
 const protocol = ( Object.keys(tls).length != 0 ) ? https : http;
 const server = protocol.createServer(tls, app);
-let io = new socketIo(server);
-const sanitize = (slideshow_content) => {
-  return sanitizeHtml(slideshow_content, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote']),
-    allowedAttributes: {
-      'h1': ['class','style'],
-      'h2': ['class','style'],
-      'h3': ['class','style'],
-      'h4': ['class','style'],
-      'h5': ['class','style'],
-      'h6': ['class','style'],
-      'p': ['class','style'],
-      'div': ['class','style'],
-      'ol': ['class','style'],
-      'ul': ['class','style'],
-      'li': ['class','style'],
-      'blockquote': ['class','style'],
-      'pre': ['class','style'],
-      'dl': ['class','style'],
-      'dt': ['class','style'],
-      'dd': ['class','style'],
-      'table': ['class','style'],
-      'tr': ['class','style'],
-      'td': ['class','style'],
-      'span': ['class','style'],
-      'audio': ['class','style','data-autoplay','data-src'],
-      'video': ['class','style','data-autoplay','data-src'],
-      'aside': ['class'],
-      'code': ['class','style','contenteditable','data-trim'],
-      'a': ['href', 'name', 'target', 'style','class'],
-      'img': ['src','class','style','data-src'],
-      'section': ['data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background', 'data-background-color', 'data-autoslide','data-background-image','data-background-size','data-background-position','data-background-repeat', 'data-background-video-loop', 'data-background-video-muted', 'data-background-video', 'data-transition-speed']
-    }
-})}
-
+let io = new Server(server);
 // needs gc, max size = 25?
 let bitly_short_names = [];
 let bitly_gist_ids = [];
 
 let config = cc({
-  REVEAL_SOCKET_SECRET : process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
+  SOCKET_SECRET : process.env.SOCKET_SECRET || process.env.REVEAL_SOCKET_SECRET || (Math.floor(Math.random()*1000).toString() + new Date().getTime().toString())
 , WEBSOCKET_ENABLED : process.env.WEBSOCKET_ENABLED || "true"
 , DEFAULT_GIST : process.env.DEFAULT_GIST || 'af84d40e58c5c2a908dd'
 , REVEAL_THEME : process.env.REVEAL_THEME || '450836bbaebcf4c4ae08b331343a7886'
 , DEBUG : Number(process.env.DEBUG) || 0
 , GIST_THEMES : process.env.GIST_THEMES || "true"
+, SANITIZE_INPUT : process.env.SANITIZE_INPUT || "false"
 , GH_API_TOKEN : process.env.GH_API_TOKEN
+, CLIENT_ID : process.env.CLIENT_ID || ""
+, CLIENT_SECRET : process.env.CLIENT_SECRET || ""
 , GA_TRACKER : process.env.GA_TRACKER
 , REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
 , GIST_PATH : process.env.GIST_PATH || __dirname || '.'
@@ -95,6 +64,48 @@ let config = cc({
 , TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presented_by/"
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
 });
+
+const sanitize = (slideshow_content) => {
+  if(config.get('SANITIZE_INPUT') == 'true'){
+  return sanitizeHtml(slideshow_content, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img','section','h1','h2','aside','span','hr','br','div','blockquote','strong','small','audio','video','code','h3','h4','h5','h6']),
+    allowedAttributes: {
+      'h1': ['class','style','data_id','data-auto-animate-delay'],
+      'h2': ['class','style','data_id','data-auto-animate-delay'],
+      'h3': ['class','style','data_id','data-auto-animate-delay'],
+      'h4': ['class','style','data_id','data-auto-animate-delay'],
+      'h5': ['class','style','data_id','data-auto-animate-delay'],
+      'h6': ['class','style','data_id','data-auto-animate-delay'],
+      'p': ['class','style','data_id','data-auto-animate-delay'],
+      'div': ['class','style','data_id','data-auto-animate-delay'],
+      'ol': ['class','style','data_id'],
+      'ul': ['class','style','data_id'],
+      'li': ['class','style','data_id'],
+      'blockquote': ['class','style','data_id','data-auto-animate-delay'],
+      'pre': ['class','style','data-id','data-auto-animate-delay'],
+      'dl': ['class','style','data_id'],
+      'dt': ['class','style','data_id'],
+      'dd': ['class','style','data_id'],
+      'table': ['class','style','data_id'],
+      'tr': ['class','style','data_id'],
+      'td': ['class','style','data_id'],
+      'span': ['class','style','data_id'],
+      'small': ['data_id'],
+      'strong': ['data_id'],
+      'audio': ['class','style','data-autoplay','data-src'],
+      'video': ['class','style','data-autoplay','data-src'],
+      'aside': ['class'],
+      'code': ['class','style','contenteditable','data-trim','data-ln-start-from','data-line-numbers','data-noescape'],
+      'a': ['href', 'name', 'target', 'style','class','data_id'],
+      'img': ['src','class','style','width','height','alt','data-src','data_id'],
+      'section': ['style','data-visibility', 'data-auto-animate', 'data-auto-animate-easing', 'data-markdown', 'id', 'data-state', 'data-transition', 'data-background-transition', 'data-background', 'data-background-color', 'data-autoslide','data-background-image','data-background-size','data-background-position','data-background-repeat', 'data-background-video-loop', 'data-background-video-muted', 'data-background-video', 'data-transition-speed']
+    }
+  });
+  }else{
+    return slideshow_content;
+  }
+}
+
 const createHash = (secret) => {
 	let cipher = crypto.createHash('md5').update(secret);
 	return(cipher.digest('hex'));
@@ -122,6 +133,7 @@ const render_slideshow = (gist, theme, cb) => {
       var slides = sanitize(gist.files[i].content);
       var description = sanitize(gist.description);
       var user = gist.owner.login;
+      gist_owners[gist.id] = gist.owner.login;
       break;
     }
   }
@@ -244,6 +256,8 @@ const svgtemplate = (req, res, next) => {
 };
 
 let concurrency = 0;
+let gist_owners = [];
+let gist_tokens = [];
 
 const get_bitlink = (req, res, next) => {
   var short_name = req.params.short_name || req.query.short_name;
@@ -359,12 +373,59 @@ const get_gist = (gist_id, cb) => {
     headers: headers
   }, cb);
 }
-
-app.get("/token", (req,res) => {
-  res.send('Information about setting up your presentation environment is available in the server logs');
+const getUser = (token, cb) => {
+  ye_olde_request({
+    url: "https://api.github.com/user",
+    headers: {
+      "Authorization": "Bearer "+token,
+      "User-Agent": "gist-reveal.it",
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  }, cb);
+};
+app.get("/github/callback", (req,res) => {
+  let params = {
+    "client_id": config.get('CLIENT_ID'),
+    "client_secret": config.get('CLIENT_SECRET'),
+    "code": req.params.code || req.query.code
+  }
+  ye_olde_request({
+    url: 'https://github.com/login/oauth/access_token',
+    method: "POST",
+    json: true,
+    headers: {
+      'User-Agent': 'gist-reveal',
+      'Accept': "application/json"
+    },
+    body: params
+  },
+  (error, response, body) => {
+    if (error){
+      console.error(error);
+    }
+    if (!error && response.statusCode == 200) {
+      if(body.access_token){
+        res.redirect('/?setToken='+body.access_token);
+      }else{
+        res.redirect('/');
+      }
+    }else{
+      res.redirect('/');
+    }
+  });
+});
+app.get("/logout", (req,res) => {
+  res.redirect('/?clearToken');
+});
+app.get("/login", (req,res) => {
+  res.redirect('https://github.com/login/oauth/authorize?client_id='+config.get('CLIENT_ID'));
 });
 
-if(config.get('WEBSOCKET_ENABLED') !== "false"){ 
+if(config.get('WEBSOCKET_ENABLED') !== "false" &&
+   config.get('CLIENT_ID') !== "" &&
+   config.get('CLIENT_SECRET') !== ""){
+
   io.on('connection', (socket) => {
     concurrency = concurrency+1;
     if(config.get('DEBUG') >= 2){
@@ -372,15 +433,43 @@ if(config.get('WEBSOCKET_ENABLED') !== "false"){
     }
     var checkAndReflect = (data) => {
       if (typeof data.secret == 'undefined' || data.secret == null || data.secret === '') {console.log('Discarding mismatched socket data');return;} 
-      if (createHash(data.secret) === data.socketId) {
+      if ( gist_tokens[data.gistId] === data.secret ) {
         data.secret = null; 
-        socket.broadcast.emit(data.socketId, data);
-        console.dir(data);
+        socket.to(data.gistId).emit(data.socketId, data);
+        //console.dir(data);
       }else{
         console.log('Discarding mismatched socket data:');
-        console.dir(data);
+        //console.dir(data);
       };      
     };
+    socket.on('listen', (data) => {
+      socket.join(data.gistId);
+    });
+    socket.on('presentation_auth', (data) => {
+      if(data.secret){
+        socket.join(data.gistId);
+        getUser(data.secret, (errr, resp, bdy) => {
+          if (errr) {
+            console.error(errr);
+          }
+          if (!errr && resp.statusCode == 200) {
+            var b = JSON.parse(bdy);
+            if(b && b.login){
+              if(gist_owners[data.gistId] === b.login){
+                console.log("@"+b.login + " is broadcasting: "+ data.gistId);
+                gist_tokens[data.gistId] = data.secret;
+              }else{
+                console.log("@"+b.login + " does not own: " +data.gistId);
+                // else listen
+                //socket.emit('listen');
+              }
+            }
+          }
+        });
+      }else{
+        // logout?
+      }
+    });
     socket.on('slidechanged', checkAndReflect);
     socket.on('navigation', checkAndReflect);
     socket.on('disconnect', () => {
@@ -393,14 +482,14 @@ if(config.get('WEBSOCKET_ENABLED') !== "false"){
 }
 
 const getTokens = () => {
-  var secret = config.get('REVEAL_SOCKET_SECRET');
-  var socket = createHash(secret);
+  const secret = config.get('SOCKET_SECRET');
+  const socket = createHash(secret);
   response = {"socket_secret": secret, "socket_id": socket};
   return response;
 };
 
 const getClientConfig = () => {
-  var tokens = getTokens();
+  const tokens = getTokens();
   if(config.get('WEBSOCKET_ENABLED') == "false"){
     return "hosted: false";
   }

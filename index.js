@@ -1,4 +1,8 @@
 import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
+import {createWriteStream} from 'node:fs';
+import {pipeline} from 'node:stream';
+import {promisify} from 'node:util'
 import { dirname } from 'path';
 import { mkdirp } from 'mkdirp';
 import { Server } from "socket.io";
@@ -9,7 +13,7 @@ import cc from 'config-multipaas';
 import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
-import ye_olde_request from 'request';
+const streamPipeline = promisify(pipeline);
 import sanitizeHtml from "sanitize-html";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -169,7 +173,7 @@ const install_theme = (gist) => {
   let filename = '';
   console.log("installing gist: "+gist.id);
   try{
-    fs.mkdir(theme_folder, {recursive: true}, function(errs){
+    fs.mkdir(theme_folder, {recursive: true}, async function(errs){
       if(errs){
         console.error(errs);
       };
@@ -187,7 +191,6 @@ const install_theme = (gist) => {
               console.error(err);
             }else{
               console.log('theme installed: '+gist.id);
-              //console.log('theme installed: '+filename);
             }
           });
         }else{
@@ -196,9 +199,10 @@ const install_theme = (gist) => {
           }else{
             filename = path.resolve('css','theme','gists',gist.id,filenm)
           }
-          ye_olde_request({url: gist.files[i].raw_url}).pipe(fs.createWriteStream(filename)).on('error', (err) => {
-            console.error(err)
-          })
+
+          const response = await fetch(gist.files[i].raw_url);
+          if (!response.ok) throw new Error(`unexpected response ${response.statusText}`);
+          await streamPipeline(response.body, createWriteStream(filename));
         }
       }
     });
@@ -227,10 +231,9 @@ const get_theme = (gist_id, cb) => {
       cb('gists/'+gist_id+'/'+gist_id);
     }else{
       //console.log("new theme: " + gist_id);
-      get_gist(gist_id, (error, response, api_response) => {
+      get_gist(gist_id, (response, gist) => {
         //cache the content
-        if (!error && response.statusCode == 200) {
-          gist = JSON.parse(api_response);
+        if (response.ok) {
           install_theme(gist);
           console.log("gist retrieved : " + gist_id);
           cb('gists/'+gist_id+'/'+gist_id)
@@ -259,10 +262,10 @@ let concurrency = 0;
 let gist_owners = [];
 let gist_tokens = [];
 
-const get_bitlink = (req, res, next) => {
-  var short_name = req.params.short_name || req.query.short_name;
-  var payload_id,payload_offset,id_start,payload_end;
-  var payload_identifier="<meta name=\"gist_id\" content=\"";
+const get_bitlink = async (req, res, next) => {
+  const short_name = req.params.short_name || req.query.short_name;
+  const payload_identifier="<meta name=\"gist_id\" content=\"";
+  let payload_id,payload_offset,id_start,payload_end;
 
   //if the bitly_short_name is in the cache, call get_slides on the cached id
   if( !!bitly_short_names[short_name] ){
@@ -272,30 +275,27 @@ const get_bitlink = (req, res, next) => {
   
   //else return a redirect to bit.ly, let them service the request
   } else {
-
     console.log('looking up bitlink: http://bit.ly/' + short_name );
-    ye_olde_request({url: "http://bit.ly/"+short_name },
-      (error, response, payload) => {
-        if (!error && response.statusCode == 200) {
-          payload_offset = payload.indexOf(payload_identifier)
-          id_start = payload_offset+payload_identifier.length;
-          payload_end = payload.indexOf('"', id_start)
-          payload_id = payload.substring(id_start, payload_end);
-          //console.log("bitlink id: " + payload_id);
-          if(payload_offset !== -1 && payload_id){
-            if(!bitly_short_names[short_name] && !bitly_gist_ids[payload_id]){
-              bitly_short_names[short_name] = payload_id;
-              bitly_gist_ids[payload_id] = short_name;
-              console.log("bitlink gist_id cached: " + payload_id);
-            }
-          }else{
-            console.log("bitlink not found: bit.ly/"+short_name);
-          }
-        }else{
-          console.log("bitlink not found: bit.ly/"+short_name);
+    const response = await fetch("http://bit.ly/"+short_name);
+    if(response.ok){
+      const payload = await response.text();
+      payload_offset = payload.indexOf(payload_identifier)
+      id_start = payload_offset+payload_identifier.length;
+      payload_end = payload.indexOf('"', id_start)
+      payload_id = payload.substring(id_start, payload_end);
+      //console.log("bitlink id: " + payload_id);
+      if(payload_offset !== -1 && payload_id){
+        if(!bitly_short_names[short_name] && !bitly_gist_ids[payload_id]){
+          bitly_short_names[short_name] = payload_id;
+          bitly_gist_ids[payload_id] = short_name;
+          console.log("bitlink gist_id cached: " + payload_id);
         }
+      }else{
+        console.log("bitlink not found: bit.ly/"+short_name);
       }
-    );
+    }else{
+      console.log("bitlink not found: bit.ly/"+short_name);
+    }
 
     //console.log("redirecting to: bit.ly/" + short_name);
     res.redirect('http://bit.ly/' + short_name);
@@ -340,10 +340,10 @@ const get_slides = (req, res, next) => {
       });
     });
   }else{
-    get_gist(gist_id, (error, response, api_response) => {
-      if (!error && response.statusCode == 200) {
-        gist = JSON.parse(api_response);
-      }else if (response.statusCode == 403){
+    get_gist(gist_id, (response, thegist) => {
+      if (response.ok) {
+        gist = thegist;
+      }else if (response.status == 403){
         gist = rate_limit_slides;
       }else{
         gist = error_slides;
@@ -356,65 +356,43 @@ const get_slides = (req, res, next) => {
   }
 }
 
-const get_gist = (gist_id, cb) => {
-  var gist_api_url = "https://api.github.com/gists/";
-  // hits rate limits quickly when auth is omitted
-  var headers = {
+const get_gist = async (gist_id, cb) => {
+  const gist_api_url = "https://api.github.com/gists/";
+  let headers = {
     'Accept': 'application/vnd.github+json',
     'User-Agent': "gist-reveal.it",
     'X-GitHub-Api-Version': '2022-11-28'
   };
   if( typeof config.get('GH_API_TOKEN') !== "undefined" && config.get('GH_API_TOKEN') !== "" ){
-    headers.Authorization = 'Bearer '+config.get('GH_API_TOKEN');
+    headers['Authorization'] = 'Bearer '+config.get('GH_API_TOKEN');
   }
-
-  ye_olde_request({
-    url: gist_api_url + gist_id,
-    headers: headers
-  }, cb);
+  const response = await fetch( gist_api_url + gist_id, { headers: headers });
+  const body = await response.json();
+  cb(response, body);
 }
-const getUser = (token, cb) => {
-  ye_olde_request({
-    url: "https://api.github.com/user",
-    headers: {
-      "Authorization": "Bearer "+token,
-      "User-Agent": "gist-reveal.it",
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    }
-  }, cb);
-};
-app.get("/github/callback", (req,res) => {
-  let params = {
+app.get("/github/callback", async(req,res) => {
+  const params = {
     "client_id": config.get('CLIENT_ID'),
     "client_secret": config.get('CLIENT_SECRET'),
     "code": req.params.code || req.query.code
   }
-  ye_olde_request({
-    url: 'https://github.com/login/oauth/access_token',
-    method: "POST",
-    json: true,
+  const response = await fetch('https://github.com/login/oauth/access_token', {
+    method: "post",
     headers: {
       'User-Agent': 'gist-reveal',
+      'Content-Type': 'application/json',
       'Accept': "application/json"
     },
-    body: params
-  },
-  (error, response, body) => {
-    if (error){
-      console.error(error);
-    }
-    if (!error && response.statusCode == 200) {
-      if(body.access_token){
-        res.redirect('/?setToken='+body.access_token);
-      }else{
-        res.redirect('/');
-      }
-    }else{
-      res.redirect('/');
-    }
+    body: JSON.stringify(params)
   });
+  const body = await response.json();
+  if(body.access_token){
+    res.redirect('/?setToken='+body.access_token);
+  }else{
+    res.redirect('/');
+  }
 });
+
 app.get("/logout", (req,res) => {
   res.redirect('/?clearToken');
 });
@@ -436,38 +414,36 @@ if(config.get('WEBSOCKET_ENABLED') !== "false" &&
       if ( gist_tokens[data.gistId] === data.secret ) {
         data.secret = null; 
         socket.to(data.gistId).emit(data.socketId, data);
-        //console.dir(data);
       }else{
         console.log('Discarding mismatched socket data: '+data.gistId);
-        //console.dir(data);
       };      
     };
     socket.on('listen', (data) => {
       socket.join(data.gistId);
     });
-    socket.on('presentation_auth', (data) => {
-      if(data.secret){
+    socket.on('presentation_auth', async(data) => {
+      if(data.secret && data.gistId){
         socket.join(data.gistId);
-        getUser(data.secret, (errr, resp, bdy) => {
-          if (errr) {
-            console.error(errr);
-          }
-          if (!errr && resp.statusCode == 200) {
-            var b = JSON.parse(bdy);
-            if(b && b.login){
-              if(gist_owners[data.gistId] === b.login){
-                console.log("@"+b.login + " is broadcasting: "+ data.gistId);
-                gist_tokens[data.gistId] = data.secret;
-              }else{
-                console.log("@"+b.login + " does not own: " +data.gistId);
-                // else listen
-                //socket.emit('listen');
-              }
-            }else{
-              console.log("Auth failed");
-            }
+        const response = await fetch(
+          "https://api.github.com/user", {
+          headers: {
+            "Authorization": "Bearer "+data.secret,
+            "User-Agent": "gist-reveal.it",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
           }
         });
+        const b = await response.json();
+        if(b && b.login){
+          if(gist_owners[data.gistId] === b.login){
+            console.log("@"+b.login + " is broadcasting: "+ data.gistId);
+            gist_tokens[data.gistId] = data.secret;
+          }else{
+            console.log("@"+b.login + " does not own: " +data.gistId);
+          }
+        }else{
+          console.log("Auth failed");
+        }
       }else{
         // logout?
       }

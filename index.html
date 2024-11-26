@@ -38,7 +38,7 @@
         box-shadow: none;
         background: transparent;
         position: fixed;
-        left: 135px;
+        left: 10px;
         bottom: 10px;
         margin: 0px;
       }
@@ -78,7 +78,9 @@
         {{slides}}
       </div>
       <div class='callouts'>
+        <!--
         <a id='logo-link' class='callouts' href="{{template_logo_url}}"><img id="logo-link" alt="{{template_logo_text}}" src="{{template_logo_img}}" /></a>
+        -->
         <a id='gist-link' class='callouts' href="{{template_gist_url}}"><img id="gist-link" alt="{{template_gist_text}}" src="{{template_gist_img}}" /></a>
       </div>
     </div>
@@ -123,7 +125,7 @@
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
-					{ src: 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js', async: true },
+					{ src: 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js', async: true },
 					{ src: '/js/client.js', async: true }
 				]
 			});

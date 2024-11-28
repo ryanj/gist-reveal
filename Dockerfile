@@ -1,13 +1,13 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14:latest
+FROM registry.access.redhat.com/ubi9/nodejs-22:latest
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY --chown=1001:1001 package*.json ./
 
 # Install app dependencies
-RUN npm install --production
+RUN npm install --omit=dev
 
 # Copy the dependencies into a minimal Node.js image
-FROM registry.access.redhat.com/ubi8/nodejs-14-minimal:latest
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
 
 # Install app dependencies
 COPY --from=0 /opt/app-root/src/node_modules /opt/app-root/src/node_modules

@@ -1,8 +1,8 @@
 # Gist-Reveal
 
-## Gist-powered Revealjs
+[Gist-Reveal](http://gist-reveal.it/) is an open source slideshow templating service that makes it possible to view and share [Reveal.js](https://github.com/hakimel/reveal.js) presentations using github's [gist](http://gist.github.com) service as a datastore.
 
-[Gist-Reveal](http://gist-reveal.it/) is an open source slideshow templating service that makes it possible to view and share [Reveal.js](https://github.com/hakimel/reveal.js) slide decks using github's [gist](http://gist.github.com) service as a datastore.
+## Gist-powered Revealjs
 
 Store any Revealjs [HTML](https://revealjs.com/markup/) or [Markdown](https://revealjs.com/markdown/) `<section>`s in a [gist](http://gist.github.com), then [append your resulting gist id to the end of any `gist-reveal` site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view your slides:
 
@@ -14,13 +14,13 @@ Example:
 
 Use [bit.ly](http://bit.ly) or another url shortener to make these long urls easier to share, and to make enagement rates easier to count.
 
-### Broadcasting Slide Transitions
+### Broadcast Your Slide Transitions
 
 Presenters can visit [`/login`](https://gist-reveal.it/login) to configure their browser as a presentation device:
 
     https://gist-reveal.it/login
 
-WARNING: Only the gist owner is allowed to broadcast slide transitions to viewers.  Mismatched presenter actions are ignored.  If needed, fork the slide deck and present using the new gist ID!
+*WARNING:* Only the gist owner is allowed to broadcast slide transitions to viewers.  Mismatched presenter actions are ignored.  If needed, fork the slide deck and present using the new gist ID!  See the web console output for additional details.
 
 When you are finished presenting, reset to "Listener" mode by visiting [`/logout`](https://gist-reveal.it/logout):
 
@@ -60,21 +60,21 @@ The following environment variables can be used to configure gist-reveal:
 
 Variable Name  | Contents   |  Default Value
 ---------------|------------|---------------
-PORT | The server port number | 8080
 DEFAULT_GIST   | The default gist id content for the site | [af84d40e58c5c2a908dd](https://gist.github.com/ryanj/af84d40e58c5c2a908dd)
 REVEAL_THEME | The site's default theme. Can be a locally bundled theme name, or a remote gist_id | [450836bbaebcf4c4ae08b331343a7886](https://gist.github.com/ryanj/450836bbaebcf4c4ae08b331343a7886) 
 GH_API_TOKEN | GitHub API token | unset
-CLIENT_ID | GitHub [OAuth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) Client ID. Required for Websocket connections | unset
-CLIENT_SECRET | GitHub [OAuth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) Client Secret. Required for Websocket connections | unset
+CLIENT_ID | GitHub OAuth Client ID. Required for Websocket connections | unset
+CLIENT_SECRET | GitHub OAuth Client Secret. Required for Websocket connections | unset
 PRIVATE_KEY | TLS private key provided as Env var or file: `private.key` | unset
 PUBLIC_CRT | Public TLS certificate as Env var or as file: `public.crt` | unset
+PORT | server port | 8080
 GA_TRACKER | Google Analytics tracker token | unset
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically via querystring "?theme=gist_id" | "true"
 SANITIZE_INPUT | Sanitize gist input. Strip script tags and iframes | "false"
 GIST_PATH | Load slides from a local gist repo (Disable API and Websockets) | unset
 GIST_FILENAME | Load slides from a local gist repo (Disable API and Websockets) |unset
 
-To enable websocket connections, provide an OAuth `CLIENT_ID` and `CLIENT_SECRET` configured with a redirect url of `YOUR_SITE/github/callback`.
+To enable websocket connections, provide an [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) `CLIENT_ID` and `CLIENT_SECRET` with a redirect url configured to: `YOUR_SITE/github/callback`
 
 ### Local Development
 
@@ -96,7 +96,23 @@ openssl req -x509 -out public.crt -keyout private.key \
    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 ```
 
-### Container
+#### Local Dev for Slides 
+
+Prefer to develop slides using your own editor, or plan to make a lot of changes to your presentation sources? Configure `gist-reveal` to load a locally cloned gist repo using the `GIST_PATH` and `GIST_FILENAME` parameters.
+
+Make a local clone of your gist repo in another folder:
+```bash
+git clone git@gist.github.com:af84d40e58c5c2a908dd ../af84d40e58c5c2a908dd
+```
+
+Configure `gist-reveal` to load a local gist:
+```bash
+GIST_PATH=../af84d40e58c5c2a908dd GIST_FILENAME=gist-reveal.it-slides.html npm start
+```
+
+When you are done editing your slides, `add` and `commit` your changes then `git push` to deploy.
+
+### Containers
 
 Run the [container image](https://registry.hub.docker.com/r/ryanj/gist-reveal) locally on port `8080` using `podman` or `docker`:
 

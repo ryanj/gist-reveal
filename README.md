@@ -1,41 +1,43 @@
-# Gist-Reveal
+# gist-reveal
 
-[Gist-Reveal](http://gist-reveal.it/) is an open source slideshow templating service that makes it possible to view and share [Reveal.js](https://github.com/hakimel/reveal.js) presentations using github's [gist](http://gist.github.com) service as a datastore.
+[Gist-reveal](http://gist-reveal.it/) is a slideshow templating service that makes it possible to view and share [reveal.js](https://github.com/hakimel/reveal.js) presentations using github's [gist](http://gist.github.com) service as a datastore.
 
-## Gist-powered Revealjs
+Try it out at: https://gist-reveal.it
 
-Store any Revealjs [HTML](https://revealjs.com/markup/) or [Markdown](https://revealjs.com/markdown/) `<section>`s in a [gist](http://gist.github.com), then [append your resulting gist id to the end of any `gist-reveal` site url](http://gist-reveal.it/af84d40e58c5c2a908dd#/try-it) to view your slides:
+## Gist-powered reveal.js presentations
 
-    http://gist-reveal.it/YOUR_GIST_ID
+Store revealjs [HTML](https://revealjs.com/markup/) or [Markdown](https://revealjs.com/markdown/) `<section>`s in a [gist](http://gist.github.com), then append your resulting gist id to any `gist-reveal` site url to view your slides:
+
+    https://gist-reveal.it/YOUR_GIST_ID
     
 Example:
 
-    http://gist-reveal.it/af84d40e58c5c2a908dd
+    https://gist-reveal.it/af84d40e58c5c2a908dd
 
-Use [bit.ly](http://bit.ly) or another url shortener to make these long urls easier to share, and to make enagement rates easier to count.
+Use [bit.ly](http://bit.ly) or another url shortener to make these long urls easier to share, and to make enagement rates easier to track.
 
-### Broadcast Your Slide Transitions
+### Broadcast slide transitions
 
 Presenters can visit [`/login`](https://gist-reveal.it/login) to configure their browser as a presentation device:
 
     https://gist-reveal.it/login
 
-*WARNING:* Only the gist owner is allowed to broadcast slide transitions to viewers.  Mismatched presenter actions are ignored.  If needed, fork the slide deck and present using the new gist ID!  See the web console output for additional details.
+*WARNING:* Only the gist owner is allowed to broadcast slide transitions to viewers. If needed, fork the slide deck and present using the new gist ID. See the web console output for additional details.
 
-When you are finished presenting, reset to "Listener" mode by visiting [`/logout`](https://gist-reveal.it/logout):
+Visit [`/logout`](https://gist-reveal.it/logout) to exit presentation mode:
 
     https://gist-reveal.it/logout
 
-### Gist-powered Slideshow Themes
+### Gist-powered themes
 
-Use the "`?theme=`" querystring parameter to access site themes.  Available [CSS themes](https://gist-reveal.it/#/themes) include the default list of [Revealjs themes](https://revealjs.com/themes/):
+Use the "`?theme=`" querystring parameter to access site themes.  Available [CSS themes](https://gist-reveal.it/#/themes) include the default list of [revealjs themes](https://revealjs.com/themes/):
 
  * [revealjs black theme](http://gist-reveal.it/?theme=black#/themes)
  * [revealjs simple theme](http://gist-reveal.it/?theme=simple#/themes)
  * [revealjs league theme](http://gist-reveal.it/?theme=league#/themes)
  * [revealjs sky theme](http://gist-reveal.it/?theme=sky#/themes)
 
-It is also possible to load a custom CSS theme [using another gist](https://gist-reveal.it/#/gist-themes):
+It is also possible to load a custom theme using [another gist](https://gist-reveal.it/#/gist-themes). For example:
 
  * [a dark winter theme](http://gist-reveal.it/?theme=60e54843de11a545897e#/gist-themes)
 
@@ -51,8 +53,8 @@ Example:
 
 Much nicer!  Make sure to continue sending traffic to the shorter `bit.ly/shortname` url for metrics collection purposes.
 
-## Running Gist-Reveal.it
-Run your own Gist-powered RevealJS slideshow service with gist-reveal
+## Running gist-reveal
+Run your own Gist-powered reveal.js slideshow service with `gist-reveal`
 
 ### Application Config
 
@@ -67,7 +69,7 @@ CLIENT_ID | GitHub OAuth Client ID. Required for Websocket connections | unset
 CLIENT_SECRET | GitHub OAuth Client Secret. Required for Websocket connections | unset
 PRIVATE_KEY | TLS private key provided as Env var or file: `private.key` | unset
 PUBLIC_CRT | Public TLS certificate as Env var or as file: `public.crt` | unset
-PORT | server port | 8080
+PORT | the server port | 8080
 GA_TRACKER | Google Analytics tracker token | unset
 GIST_THEMES | Allow reveal.js CSS themes to be installed dynamically via querystring "?theme=gist_id" | "true"
 SANITIZE_INPUT | Sanitize gist input. Strip script tags and iframes | "false"
@@ -96,21 +98,21 @@ openssl req -x509 -out public.crt -keyout private.key \
    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 ```
 
-#### Local Dev for Slides 
+#### Local Dev with Local Slides
 
-Prefer to develop slides using your own editor, or plan to make a lot of changes to your presentation sources? Configure `gist-reveal` to load a locally cloned gist repo using the `GIST_PATH` and `GIST_FILENAME` parameters.
+Prefer to develop slides using your own editor? Or, plan to make a lot of changes to your presentation sources? Try loading a local clone of your gist repo!
 
-Make a local clone of your gist repo in another folder:
+1. Make a local clone of your gist repo in another folder:
 ```bash
-git clone git@gist.github.com:af84d40e58c5c2a908dd ../af84d40e58c5c2a908dd
+git clone git@gist.github.com:af84d40e58c5c2a908dd ../example-slides
 ```
 
-Configure `gist-reveal` to load a local gist:
+2. Use the `GIST_PATH` and `GIST_FILENAME` parameters to load local slides:
 ```bash
-GIST_PATH=../af84d40e58c5c2a908dd GIST_FILENAME=gist-reveal.it-slides.html npm start
+GIST_PATH=../example-slides GIST_FILENAME=gist-reveal.it-slides.html npm start
 ```
 
-When you are done editing your slides, `add` and `commit` your changes then `git push` to deploy.
+When you are done editing, `add` and `commit` your changes then `git push` to deploy.
 
 ### Containers
 
@@ -139,7 +141,7 @@ kubectl run gist-reveal --image=ryanj/gist-reveal --expose --port=8080 \
 
 ## License
 
-[gist-reveal.it](http://gist-reveal.it/) was created at the first [DockerCon Hackathon](http://blog.docker.com/2014/07/dockercon-video-dockercon-hackathon-winners/) by [@ryanj](https://github.com/ryanj) and [@fkautz](https://github.com/fkautz).
+[gist-reveal](https://gist-reveal.it/) was created at the first [DockerCon Hackathon](https://web.archive.org/web/20140715021725/http://blog.docker.com/2014/07/dockercon-video-dockercon-hackathon-winners/) by [@ryanj](https://github.com/ryanj) and [@fkautz](https://github.com/fkautz).
 
 [Reveal.js](https://github.com/hakimel/reveal.js) is MIT licensed
 Copyright (C) 2014 Hakim El Hattab, http://hakim.se

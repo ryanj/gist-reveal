@@ -34,8 +34,9 @@ try{
   // certificates available!
   console.log("protocol: https+wss")
 } catch (err){
-  console.error(err);
+  //console.error(err);
   // certificates unavailable
+  console.log('TLS unavailable');
   // fallback to http/ws connections
   console.log("protocol: http+ws")
 }

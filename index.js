@@ -20,7 +20,7 @@ const __dirname = dirname(__filename);
 const rate_limit_slides = JSON.parse(fs.readFileSync('./responses/rate_limit_response.json'));
 const default_slides = JSON.parse(fs.readFileSync('./responses/default_response.json'));
 const error_slides = JSON.parse(fs.readFileSync('./responses/error_response.json'));
-const local_slide_resp = JSON.parse(fs.readFileSync('./local_slides.json'));
+const local_slide_resp = JSON.parse(fs.readFileSync('./responses/local_slides.json'));
 
 const app = express();
 let tls = {};

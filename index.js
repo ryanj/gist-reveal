@@ -150,6 +150,9 @@ const ga_tracker_html = (tracker_id) => {
 };
 
 const render_slideshow = (gist, theme, cb) => {
+  if(config.get('DEBUG') >= 1){
+    console.log("render: https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+  }
   for(let i in gist.files){
     if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
       var title = sanitize(i);
@@ -283,6 +286,7 @@ let gist_tokens = [];
 
 const get_bitlink = async (req, res, next) => {
   const short_name = req.params.short_name || req.query.short_name;
+  const theme = req.params.theme || req.query.theme;
   const payload_identifier="<meta name=\"gist_id\" content=\"";
   let payload_id,payload_offset,id_start,payload_end;
 
@@ -308,7 +312,7 @@ const get_bitlink = async (req, res, next) => {
           bitly_short_names[short_name] = payload_id;
           bitly_gist_ids[payload_id] = short_name;
           console.log("bitlink gist_id cached: " + payload_id);
-          if( req.query['theme'] ){
+          if( theme ){
             res.redirect('/bit.ly/'+bitly_gist_ids[payload_id]+'?theme='+theme);
           }else{
             res.redirect("/bit.ly/"+bitly_gist_ids[payload_id]);

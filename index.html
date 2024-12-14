@@ -61,7 +61,7 @@
       }
     </style>
 
-    <link rel="alternate" type="text/html" href="?print-pdf" media='print'>
+    <link rel="alternate" type="text/html" href="{{print-pdf-href}}" media='print'>
     <link rel="stylesheet" href="/node_modules/reveal.js/dist/reset.css">
     <link rel="stylesheet" href="/node_modules/reveal.js/dist/reveal.css">
     <link rel="stylesheet" href="/css/theme/black.css">
@@ -88,6 +88,7 @@
                 <script src="/node_modules/reveal.js/dist/reveal.js"></script>
                 <script src="/node_modules/reveal.js/plugin/notes/notes.js"></script>
                 <script src="/node_modules/reveal.js/plugin/markdown/markdown.js"></script>
+                <script src="/node_modules/reveal.js/plugin/zoom/zoom.js"></script>
                 <script src="/node_modules/reveal.js/plugin/highlight/highlight.js"></script>
 
                 //{{ga-tracker}}
@@ -106,7 +107,7 @@
 			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
                                 hash: true,
-                                plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+                                plugins: [ RevealZoom, RevealMarkdown, RevealHighlight, RevealNotes ],
 				width: 960,
 				height: 710,
 				margin: 0.1,

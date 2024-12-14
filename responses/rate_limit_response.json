@@ -2,12 +2,13 @@
   "files": {
     "rate-limit-error": {
       "type": "text/html",
-      "content": "    <section><p>We've hit our limit!<br />Our application's GitHub API rate limit has been reached.</p><br /><p><a href=\"http://gist-reveal.it/\">Come back, and try again soon!</p></section>"
+      "content": "    <section><h3><b>Error:</b> Rate limit reached!</h3><p>The site may need an updated <a href=\"https://github.com/ryanj/gist-reveal?tab=readme-ov-file#application-config\"><code>GH_API_TOKEN</code></a></p><p><a href=\"https://github.com/ryanj/gist-reveal/issues\">Contact the site admin for support</a></p></section>"
     }
   },
+  "id": "gist-reveal-rate-limit-error",
   "description": "gist-reveal.it - open source slides powered by gist.github.com and Reveal.js",
   "owner": {
-    "login": "ryanj",
+    "login": "gist-reveal",
     "avatar_url": "https://avatars.githubusercontent.com/u/17562?",
     "gravatar_id": "ee8fbe2cda4f05ef6dea595ced8f6e1a",
     "url": "https://api.github.com/users/ryanj",

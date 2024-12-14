@@ -2,12 +2,13 @@
   "files": {
     "error-page": {
       "type": "text/html",
-      "content": "    <section><p>Sorry, something went wrong and I wasn't able to convert this Gist ID into a slide deck.</p><br /><p><a href=\"http://gist-reveal.it/\">Learn how to use gist-reveal.it to host and share your own open source slides!</a></p></section>"
+      "content": "    <section><h1>Error</h1><p>Invalid Gist ID, or error rendering slideshow</p><p><a href=\"/#/try-it\">Learn how to use gist-reveal</a></p></section>"
     }
   },
+  "id": "gist-reveal-render-error",
   "description": "gist-reveal.it - open source slides powered by gist.github.com and Reveal.js",
   "owner": {
-    "login": "ryanj",
+    "login": "Error",
     "avatar_url": "https://avatars.githubusercontent.com/u/17562?",
     "gravatar_id": "ee8fbe2cda4f05ef6dea595ced8f6e1a",
     "url": "https://api.github.com/users/ryanj",

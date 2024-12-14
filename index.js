@@ -133,7 +133,12 @@ const createHash = (secret) => {
 	let cipher = crypto.createHash('md5').update(secret);
 	return(cipher.digest('hex'));
 };
+const favicon = fs.readFileSync(__dirname + '/img/k8s-favicon.ico');
 const presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
+const presented_by_small = fs.readFileSync(__dirname + '/img/presented_by_small.svg');
+const presented_by_med = fs.readFileSync(__dirname + '/img/presented_by_med.svg');
+const presented_by_medium = fs.readFileSync(__dirname + '/img/presented_by_medium.svg');
+const presented_by_wide = fs.readFileSync(__dirname + '/img/presented_by_wide.svg');
 const ga_tracker_html = (tracker_id) => {
   if(typeof(tracker_id) !== 'undefined'){
     return "<!-- Google tag (gtag.js) -->\n"+
@@ -149,9 +154,23 @@ const ga_tracker_html = (tracker_id) => {
   }
 };
 
-const render_slideshow = (gist, theme, cb) => {
+const render_slideshow = (gist, theme, gist_id, cb) => {
   if(config.get('DEBUG') >= 1){
-    console.log("render: https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+    if(bitly_gist_ids[gist.id]){
+      console.log("render: https://bit.ly/" + bitly_gist_ids[gist.id] + " -> https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+    }else if (gist.id === "gist-reveal-rate-limit-error"){
+      console.log("ERROR: API Rate Limit Reached!");
+    }else if (gist.id === "gist-reveal-render-error"){
+      console.log("error: 404@"+ gist_id );
+    }else{
+      console.log("render: https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+    }
+  }
+  var print_pdf_href = "/"+gist_id;
+  if( theme && theme != config.get('REVEAL_THEME') ){
+    print_pdf_href=print_pdf_href+"?theme="+theme+"&print-pdf";
+  }else{
+    print_pdf_href=print_pdf_href+"?print-pdf";
   }
   for(let i in gist.files){
     if( gist.files[i].type == "text/html" || gist.files[i].type.indexOf('image' < 0 ) ){
@@ -173,10 +192,11 @@ const render_slideshow = (gist, theme, cb) => {
                            .replace(/\{\{template_logo_url}}/, config.get('TEMPLATE_LOGO_URL'))
                            .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
                            .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
-                           .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist.id)
+                           .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist_id)
                            .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT')+user)
                            .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG')+user+'.svg')
                            .replace(/\{\{gist_id}}/, gist.id)
+                           .replace(/\{\{print-pdf-href}}/, print_pdf_href)
                            .replace(/\{\{user}}/, user)
                            .replace(/\{\{description}}/, description)
     )
@@ -255,7 +275,7 @@ const get_theme = (gist_id, cb) => {
       //console.log("new theme: " + gist_id);
       get_gist(gist_id, (response, gist) => {
         //cache the content
-        if (response.ok) {
+        if (response.ok && !response.error_404 ) {
           install_theme(gist);
           console.log("gist retrieved : " + gist_id);
           cb('gists/'+gist_id+'/'+gist_id)
@@ -272,12 +292,20 @@ const get_theme = (gist_id, cb) => {
 
 const svgtemplate = (req, res, next) => {
   const presenter_name = req.params.username || 'gist-reveal';
-  //var presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
-  //console.log('button: {text: "'+presenter_name+'"}')
-  //console.log("request url:" + req.url)
   res.status(200);
   res.header('Content-Type', 'image/svg+xml');
-  res.end(presented_by.toString().replace(/gist-reveal/, "@"+presenter_name));
+  //TODO: GUESS THE TEXT WIDTH?:
+  if( presenter_name.length >= 17 ){
+    res.end(presented_by_wide.toString().replace(/gist-reveal/, "@"+presenter_name));
+  }else if( presenter_name.length >= 14){
+    res.end(presented_by_medium.toString().replace(/gist-reveal/, "@"+presenter_name));
+  }else if( presenter_name.length >= 12){
+    res.end(presented_by_med.toString().replace(/gist-reveal/, "@"+presenter_name));
+  }else if( presenter_name.length >= 9){
+    res.end(presented_by_small.toString().replace(/gist-reveal/, "@"+presenter_name));
+  }else{
+    res.end(presented_by.toString().replace(/gist-reveal/, "@"+presenter_name));
+  }
 };
 
 let concurrency = 0;
@@ -361,7 +389,7 @@ const get_slides = (req, res, next) => {
     }
   }else if( config.get('GIST_FILENAME')){
     get_local_slides( (gist) => {
-      render_slideshow(gist, theme, (slides) => {
+      render_slideshow(gist, theme, gist_id, (slides) => {
         res.send(slides);
         //return next();
       });
@@ -369,13 +397,18 @@ const get_slides = (req, res, next) => {
   }else{
     get_gist(gist_id, (response, thegist) => {
       if (response.ok) {
+        if (response.error_404) {
+          res.status(404);
+        }
         gist = thegist;
       }else if (response.status == 403){
         gist = rate_limit_slides;
+        res.status(403);
       }else{
         gist = error_slides;
+        res.status(404);
       }
-      render_slideshow(gist, theme, (slides) => {
+      render_slideshow(gist, theme, gist_id, (slides) => {
         res.send(slides);
         //return next();
       });
@@ -384,19 +417,28 @@ const get_slides = (req, res, next) => {
 }
 
 const get_gist = async (gist_id, cb) => {
-  const gist_api_url = "https://api.github.com/gists/";
-  let headers = {
-    'Accept': 'application/vnd.github+json',
-    'User-Agent': "gist-reveal.it",
-    'X-GitHub-Api-Version': '2022-11-28'
-  };
-  if( typeof config.get('GH_API_TOKEN') !== "undefined" && config.get('GH_API_TOKEN') !== "" ){
-    headers['Authorization'] = 'Bearer '+config.get('GH_API_TOKEN');
+  const min_gist_id_length = 20;
+  if( gist_id.length && gist_id.length >= min_gist_id_length && gist_id.indexOf(".") == -1 ){
+    const gist_api_url = "https://api.github.com/gists/";
+    let headers = {
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': "gist-reveal.it",
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    if( typeof config.get('GH_API_TOKEN') !== "undefined" && config.get('GH_API_TOKEN') !== "" ){
+      headers['Authorization'] = 'Bearer '+config.get('GH_API_TOKEN');
+    }
+    if(config.get('DEBUG') >= 4){
+      console.log("fetch: "+gist_api_url + gist_id);
+    }
+    const response = await fetch( gist_api_url + gist_id, { headers: headers });
+    const body = await response.json();
+    cb(response, body);
+  }else{
+    cb({ok: true, 'error_404': true}, error_slides);
   }
-  const response = await fetch( gist_api_url + gist_id, { headers: headers });
-  const body = await response.json();
-  cb(response, body);
 }
+
 app.get("/github/callback", async(req,res) => {
   const params = {
     "client_id": config.get('CLIENT_ID'),
@@ -428,13 +470,13 @@ app.get("/login", (req,res) => {
   res.redirect('https://github.com/login/oauth/authorize?client_id='+config.get('CLIENT_ID'));
 });
 
+let io = new Server(server);
 if(config.get('WEBSOCKET_ENABLED') !== "false" &&
    config.get('CLIENT_ID') !== "" &&
    config.get('CLIENT_SECRET') !== "" &&
    !config.get('GIST_FILENAME')){
 
   console.log('Websockets: Enabled');
-  let io = new Server(server);
   io.on('connection', (socket) => {
     concurrency = concurrency+1;
     if(config.get('DEBUG') >= 3){
@@ -514,6 +556,7 @@ if(config.get('WEBSOCKET_ENABLED') !== "false" &&
   });
 }else{
   console.log('Websockets: Unavailable');
+  io.on('connection', (socket) => {return;});
 }
 
 const getTokens = () => {
@@ -530,7 +573,14 @@ const getClientConfig = () => {
   }
   return "hosted:{ id: '"+tokens.socket_id+"' }";
 };
-app.get("/", get_slides);
+app.get("/robots.txt", (req,res,next) => {
+  const robot_resp = `User-agent: *
+Disallow: /`;
+  return res.send(robot_resp);
+});
+app.get("/favicon.ico", (req,res,next) => {
+  return res.send(favicon);
+});
 app.get("/status", (req,res,next) => {
   return res.send('ok');
 });
@@ -545,6 +595,7 @@ app.use('/css/', express.static(path.resolve(__dirname,'css')));
 app.use('/js/', express.static(path.resolve(__dirname,'js')));
 app.use('/img/', express.static(path.resolve(__dirname,'img')));
 app.use('/node_modules/', express.static(path.resolve(__dirname,'node_modules')));
+app.get("/", get_slides);
 
 // SVG templating
 app.get("/img/presented_by/:username\.svg", svgtemplate);

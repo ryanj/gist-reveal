@@ -418,7 +418,7 @@ const get_slides = (req, res, next) => {
 
 const get_gist = async (gist_id, cb) => {
   const min_gist_id_length = 20;
-  if( gist_id.length && gist_id.length >= min_gist_id_length && gist_id.indexOf(".") == -1 ){
+  if( gist_id.length && gist_id.length >= min_gist_id_length && gist_id.indexOf(".") == -1 && gist_id.indexOf("-") == -1 && gist_id.indexOf("_") == -1 ){
     const gist_api_url = "https://api.github.com/gists/";
     let headers = {
       'Accept': 'application/vnd.github+json',

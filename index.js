@@ -157,13 +157,13 @@ const ga_tracker_html = (tracker_id) => {
 const render_slideshow = (gist, theme, gist_id, cb) => {
   if(config.get('DEBUG') >= 1){
     if(bitly_gist_ids[gist.id]){
-      console.log("render: https://bit.ly/" + bitly_gist_ids[gist.id] + " -> https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+      console.log("200: https://bit.ly/" + bitly_gist_ids[gist.id] + " -> https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
     }else if (gist.id === "gist-reveal-rate-limit-error"){
-      console.log("ERROR: API Rate Limit Reached!");
+      console.log("403: ERROR API Rate Limit Reached!");
     }else if (gist.id === "gist-reveal-render-error"){
-      console.log("error: 404@"+ gist_id );
+      console.log("404: "+ gist_id );
     }else{
-      console.log("render: https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
+      console.log("200: https://gist.github.com/" +gist.owner.login +"/"+ gist.id);
     }
   }
   var print_pdf_href = "/"+gist_id;

@@ -213,7 +213,9 @@ const install_theme = (gist) => {
   }
   let filenm = '';
   let filename = '';
-  console.log("installing gist: "+gist.id);
+  if(config.get('DEBUG') >= 2){
+    console.log("installing gist: "+gist.id);
+  }
   try{
     fs.mkdir(theme_folder, {recursive: true}, async function(errs){
       if(errs){
@@ -232,7 +234,9 @@ const install_theme = (gist) => {
             if(err){
               console.error(err);
             }else{
-              console.log('theme installed: '+gist.id);
+              if(config.get('DEBUG') >= 1){
+                console.log('theme installed: https://gist.github.com/' +gist.owner.login +"/"+gist.id);
+              }
             }
           });
         }else{
@@ -277,10 +281,17 @@ const get_theme = (gist_id, cb) => {
         //cache the content
         if (response.ok && !response.error_404 ) {
           install_theme(gist);
-          console.log("gist retrieved : " + gist_id);
+          if(config.get('DEBUG') >= 3){
+            console.log("gist retrieved : " + gist_id);
+          }
           cb('gists/'+gist_id+'/'+gist_id)
+        }else if (gist.id == 'gist-reveal-render-error'){
+          if(config.get('DEBUG') >= 1){
+            console.log("theme: " + gist_id);
+          }
+          cb(gist_id);
         }else{
-          if(config.get('DEBUG') >= 2){
+          if(config.get('DEBUG') >= 1){
             console.log("theme not found by id: " + gist_id);
           }
           cb(gist_id)
@@ -577,6 +588,14 @@ app.get("/robots.txt", (req,res,next) => {
   const robot_resp = `User-agent: *
 Disallow: /`;
   return res.send(robot_resp);
+});
+app.get("/:page\.php7", (req,res,next) => {
+  if(config.get('DEBUG') >= 2){console.log("404: "+req.params.page+".php7");}
+  return res.status(404).send("Not Found");
+});
+app.get("/:page\.php", (req,res,next) => {
+  if(config.get('DEBUG') >= 2){console.log("404: "+req.params.page+".php");}
+  return res.status(404).send("Not Found");
 });
 app.get("/favicon.ico", (req,res,next) => {
   return res.send(favicon);

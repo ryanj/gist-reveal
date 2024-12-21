@@ -2,7 +2,7 @@
   "files": {
     "error-page": {
       "type": "text/html",
-      "content": "    <section><h1>Error</h1><p>Invalid Gist ID, or error rendering slideshow</p><p><a href=\"/#/try-it\">Learn how to use gist-reveal</a></p></section>"
+      "content": "    <section><h1>Error</h1><p>Invalid Gist ID, or render error</p><p><a href=\"https://github.com/ryanj/gist-reveal?tab=readme-ov-file#gist-powered-revealjs-presentations\">Learn how to use gist-reveal</a></p></section>"
     }
   },
   "id": "gist-reveal-render-error",

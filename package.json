@@ -1,6 +1,6 @@
 {
   "name": "gist-reveal",
-  "version": "0.3.4",
+  "version": "0.3.6",
   "description": "Gist-powered Reveal.js slides",
   "homepage": "http://gist-reveal.it",
   "main": "index.js",
@@ -21,8 +21,7 @@
   },
   "dependencies": {
     "config-multipaas": "^0.2.2",
-    "express": "4.21.1",
-    "mkdirp": "^3.0.1",
+    "express": "4.21.2",
     "node-fetch": "^3.3.2",
     "reveal.js": "5.1.0",
     "sanitize-html": "2.13.1",

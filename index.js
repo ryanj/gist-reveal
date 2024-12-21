@@ -4,7 +4,6 @@ import {createWriteStream} from 'node:fs';
 import {pipeline} from 'node:stream';
 import {promisify} from 'node:util'
 import { dirname } from 'path';
-import { mkdirp } from 'mkdirp';
 import { Server } from "socket.io";
 import express from 'express';
 import * as fs from 'fs';
@@ -58,12 +57,8 @@ let config = cc({
 , CLIENT_ID : process.env.CLIENT_ID || ""
 , CLIENT_SECRET : process.env.CLIENT_SECRET || ""
 , GA_TRACKER : process.env.GA_TRACKER
-, REVEAL_WEB_HOST : process.env.REVEAL_WEB_HOST || process.env.OPENSHIFT_APP_DNS || 'localhost:8080'
 , GIST_PATH : process.env.GIST_PATH || __dirname || '.'
 , GIST_FILENAME : process.env.GIST_FILENAME
-, TEMPLATE_LOGO_TEXT : process.env.TEMPLATE_LOGO_TEXT || "Runs on Kubernetes"
-, TEMPLATE_LOGO_IMG : process.env.TEMPLATE_LOGO_IMG || "/img/runsonk8s.svg"
-, TEMPLATE_LOGO_URL : process.env.TEMPLATE_LOGO_URL || "https://github.com/ryanj/gist-reveal#running-gist-revealit"
 , TEMPLATE_GIST_TEXT : process.env.TEMPLATE_GIST_TEXT || "Presented by: @"
 , TEMPLATE_GIST_IMG : process.env.TEMPLATE_GIST_IMG || "/img/presented_by/"
 , TEMPLATE_GIST_URL : process.env.TEMPLATE_GIST_URL || "https://gist.github.com/"
@@ -115,23 +110,23 @@ const algorithm = 'aes-256-cbc';
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
 const encrypt = (data) => {
-    let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
-    let encrypted = cipher.update(data);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return encrypted.toString('hex');
+  let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+  let encrypted = cipher.update(data);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return encrypted.toString('hex');
 }
 const decrypt = (data) => {
-    let miv = Buffer.from(data.iv, 'hex');
-    let encryptedText = Buffer.from(data.encryptedData, 'hex');
-    let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), miv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
+  let miv = Buffer.from(data.iv, 'hex');
+  let encryptedText = Buffer.from(data.encryptedData, 'hex');
+  let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), miv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
 }
 
 const createHash = (secret) => {
-	let cipher = crypto.createHash('md5').update(secret);
-	return(cipher.digest('hex'));
+  let cipher = crypto.createHash('md5').update(secret);
+  return(cipher.digest('hex'));
 };
 const favicon = fs.readFileSync(__dirname + '/img/k8s-favicon.ico');
 const presented_by = fs.readFileSync(__dirname + '/img/presented_by.svg');
@@ -189,9 +184,6 @@ const render_slideshow = (gist, theme, gist_id, cb) => {
                            .replace(/\{\{title}}/, title)
                            .replace(/\/\/\{\{ga-tracker}}/, ga_tracker_html(config.get('GA_TRACKER')))
                            .replace(/\{\{theme}}/, themename)
-                           .replace(/\{\{template_logo_url}}/, config.get('TEMPLATE_LOGO_URL'))
-                           .replace(/\{\{template_logo_text}}/, config.get('TEMPLATE_LOGO_TEXT'))
-                           .replace(/\{\{template_logo_img}}/, config.get('TEMPLATE_LOGO_IMG'))
                            .replace(/\{\{template_gist_url}}/, config.get('TEMPLATE_GIST_URL')+gist_id)
                            .replace(/\{\{template_gist_text}}/, config.get('TEMPLATE_GIST_TEXT')+user)
                            .replace(/\{\{template_gist_img}}/, config.get('TEMPLATE_GIST_IMG')+user+'.svg')
@@ -206,6 +198,9 @@ const render_slideshow = (gist, theme, gist_id, cb) => {
 
 const install_theme = (gist) => {
   let data, theme_folder;
+  if(gist.id === "gist-reveal-render-error" || gist.id === "gist-reveal-rate-limit-error"){
+    return;
+  }
   if(process.env.NODE_ENV == "production"){
     theme_folder = path.resolve('/','tmp','gists',gist.id);
   }else{
@@ -213,8 +208,8 @@ const install_theme = (gist) => {
   }
   let filenm = '';
   let filename = '';
-  if(config.get('DEBUG') >= 2){
-    console.log("installing gist: "+gist.id);
+  if(config.get('DEBUG') >= 1){
+    console.log("installing gist: https://gist.github.com/"+gist.id);
   }
   try{
     fs.mkdir(theme_folder, {recursive: true}, async function(errs){
@@ -323,6 +318,17 @@ let concurrency = 0;
 let gist_owners = [];
 let gist_tokens = [];
 
+const cache_bitlink = (shortname, gist_id) => {
+  if(shortname && gist_id && gist_id !== config.get('DEFAULT_GIST')){
+    if( bitly_gist_ids[gist_id] ){
+      console.log("bitlink cache conflict: limit one bitlink per gist id!")
+    }else{
+      bitly_short_names[shortname] = gist_id;
+      bitly_gist_ids[gist_id] = shortname;
+      console.log("cached: https://bit.ly/"+shortname+" -> https://gist.github.com/" + gist_id);
+    }
+  }
+}
 const get_bitlink = async (req, res, next) => {
   const short_name = req.params.short_name || req.query.short_name;
   const theme = req.params.theme || req.query.theme;
@@ -348,9 +354,7 @@ const get_bitlink = async (req, res, next) => {
       //console.log("bitlink id: " + payload_id);
       if(payload_offset !== -1 && payload_id){
         if(!bitly_short_names[short_name] && !bitly_gist_ids[payload_id]){
-          bitly_short_names[short_name] = payload_id;
-          bitly_gist_ids[payload_id] = short_name;
-          console.log("bitlink gist_id cached: " + payload_id);
+          cache_bitlink(short_name,payload_id);
           if( theme ){
             res.redirect('/bit.ly/'+bitly_gist_ids[payload_id]+'?theme='+theme);
           }else{
@@ -391,7 +395,7 @@ const get_slides = (req, res, next) => {
   var theme = req.query['theme'] || config.get('REVEAL_THEME');
   var gist_id = req.params.gist_id || req.query.gist_id || config.get('DEFAULT_GIST');
   var gist = {};
-  if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') == -1 ){
+  if( !!bitly_gist_ids[gist_id] && req.path.indexOf('bit') !== 1 ){
     //console.log("redirecting to: /bit.ly/" + bitly_gist_ids[gist_id]);
     if( req.query['theme'] ){
       res.redirect('/bit.ly/'+bitly_gist_ids[gist_id]+'?theme='+theme);
@@ -468,6 +472,9 @@ app.get("/github/callback", async(req,res) => {
   const body = await response.json();
   if(body.access_token){
     const encoded = encrypt(body.access_token);
+    if(config.get('DEBUG') >= 1){
+      console.log("201: /login SUCCESS")
+    }
     res.redirect('/?setToken='+encoded);
   }else{
     res.redirect('/');
@@ -475,9 +482,11 @@ app.get("/github/callback", async(req,res) => {
 });
 
 app.get("/logout", (req,res) => {
+  if(config.get('DEBUG') >= 1){ console.log("302: /logout") }
   res.redirect('/?clearToken');
 });
 app.get("/login", (req,res) => {
+  if(config.get('DEBUG') >= 2){ console.log("302: /login REQUEST") }
   res.redirect('https://github.com/login/oauth/authorize?client_id='+config.get('CLIENT_ID'));
 });
 
@@ -568,6 +577,36 @@ if(config.get('WEBSOCKET_ENABLED') !== "false" &&
 }else{
   console.log('Websockets: Unavailable');
   io.on('connection', (socket) => {return;});
+}
+// Install Default Gist theme
+if(config.get('GIST_THEMES') && config.get('REVEAL_THEME')){
+  get_theme(config.get('REVEAL_THEME'), ()=>{})
+}
+// Install Additional Gist themes (CSV)
+if(config.get('GIST_THEMES') && process.env.INIT_THEMES){
+  for(let theme of process.env.INIT_THEMES.split(",")){
+    get_theme(theme, ()=>{})
+  }
+}
+//Import bitlink cache from CSV:
+if(process.env.BITLINK_CSV){
+  try{
+    fs.readFile(process.env.BITLINK_CSV, "utf8", (error, textContent) => {
+      if(error){
+        console.error("Failed to import csv: "+ process.env.BITLINK_CSV );
+      }else{
+        console.log("Importing bitlink csv: "+ process.env.BITLINK_CSV );
+        for(let row of textContent.split("\n")){
+          const rowItems = row.split(",");
+          if(rowItems[0] && rowItems[1]){
+            cache_bitlink(rowItems[0],rowItems[1]);
+          }
+        }
+      }
+    });
+  } catch (error){
+    console.error("Failed to import csv: "+ process.env.BITLINK_CSV );
+  }
 }
 
 const getTokens = () => {

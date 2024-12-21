@@ -8,3 +8,4 @@ tmp/**
 node_modules/
 .sass-cache
 css/theme/gists/*
+bitlinks.csv

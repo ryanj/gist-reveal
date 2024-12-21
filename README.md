@@ -2,6 +2,8 @@
 
 [Gist-reveal](http://gist-reveal.it/) is a slideshow templating service that makes it possible to view and share [reveal.js](https://github.com/hakimel/reveal.js) presentations using github's [gist](http://gist.github.com) service as a datastore.
 
+Reveal.js CSS and Javascript includes are automatically provided in each page request.
+
 Try it out at: https://gist-reveal.it
 
 ## Gist-powered reveal.js presentations
@@ -10,7 +12,7 @@ Store revealjs [HTML](https://revealjs.com/markup/) or [Markdown](https://reveal
 
     https://gist-reveal.it/YOUR_GIST_ID
     
-Example:
+For example, the slide sources at https://gist.github.com/af84d40e58c5c2a908dd can be viewed here:
 
     https://gist-reveal.it/af84d40e58c5c2a908dd
 
@@ -52,6 +54,14 @@ Example:
     http://gist-reveal.it/bit.ly/k8s-workshops
 
 Much nicer!  Make sure to continue sending traffic to the shorter `bit.ly/shortname` url for metrics collection purposes.
+
+### Export to PDF
+
+Add "`print-pdf`" to the querystring to render a printer-friendly version of your slides:
+
+    http://gist-reveal.it/YOUR_GIST_ID?print-pdf
+
+Then, [print to file](https://revealjs.com/pdf-export/#instructions) to generate the PDF
 
 ## Running gist-reveal
 Run your own Gist-powered reveal.js slideshow service with `gist-reveal`

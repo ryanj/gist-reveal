@@ -69,7 +69,8 @@
       </div>
     </div>
 
-                <script src="/node_modules/reveal.js/dist/reveal.js"></script>
+                <script type="text/javascript" src="/node_modules/reveal.js/dist/reveal.js"></script>
+                <script type="text/javascript" src="/node_modules/reveal.js-copycode/plugin/copycode/copycode.js"></script>
                 <script src="/node_modules/reveal.js/plugin/notes/notes.js"></script>
                 <script src="/node_modules/reveal.js/plugin/markdown/markdown.js"></script>
                 <script src="/node_modules/reveal.js/plugin/zoom/zoom.js"></script>
@@ -87,11 +88,10 @@
                       return decodeURIComponent(results[2].replace(/\+/g, ' '));
                     }
                     var revealit = function(){
-			// Full list of configuration options available here:
-			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
                                 hash: true,
-                                plugins: [ RevealZoom, RevealMarkdown, RevealHighlight, RevealNotes ],
+copycode: { timeout: 1200, button: "hover", display: "icons", style: { copybg: "rgba(255,255,255,128)", copiedbg: "white", copyborder: "1px solid gray", copiedborder: "1px solid green", copiedcolor: "green", offset: 0.5, radius: 0.2} },
+                                plugins: [ CopyCode, RevealZoom, RevealMarkdown, RevealHighlight, RevealNotes ],
 				width: 960,
 				height: 710,
 				margin: 0.1,
@@ -101,14 +101,8 @@
 				history: true,
 				center: true,
 				hosted: {},
-				theme: getQSParameterByName('theme'),
-				transition: getQSParameterByName('transition') || 'slide', // slide/default/cube/page/concave/zoom/linear/fade/none
-
-				// Parallax scrolling
-				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
-				// parallaxBackgroundSize: '2100px 900px',
-
-				// Optional libraries used to extend on reveal.js
+				theme: getQSParameterByName('theme') || 'black',
+				transition: getQSParameterByName('transition') || 'slide',
 				dependencies: [
 					{ src: 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js', async: true },
 					{ src: '/js/client.js', async: true }

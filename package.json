@@ -1,6 +1,6 @@
 {
   "name": "gist-reveal",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Gist-powered Reveal.js slides",
   "homepage": "http://gist-reveal.it",
   "main": "index.js",
@@ -24,6 +24,7 @@
     "express": "4.21.2",
     "node-fetch": "^3.3.2",
     "reveal.js": "5.1.0",
+    "reveal.js-copycode": "^1.2.0",
     "sanitize-html": "2.13.1",
     "socket.io": "4.8.1"
   },

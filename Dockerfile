@@ -14,7 +14,6 @@ COPY --from=0 /opt/app-root/src/node_modules /opt/app-root/src/node_modules
 COPY . /opt/app-root/src
 
 MAINTAINER ryan jarvinen <ryan.jarvinen@gmail.com>
-VOLUME ["/opt/app-root/src/css/theme/gists"]
 ENV NODE_ENV production
 ENV PORT 8080
 EXPOSE 8080

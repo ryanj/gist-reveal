@@ -268,7 +268,9 @@ const get_theme = (gist_id, cb) => {
   //if theme is found locally, return gist_id;
   fs.stat( theme_folder, (err, stats) => {
     if(!err){
-      //console.log("cached theme: " + gist_id);
+      if(config.get('DEBUG') >= 1 && gist_id !== config.get('REVEAL_THEME')){
+        console.log("theme: " + gist_id);
+      }
       cb('gists/'+gist_id+'/'+gist_id);
     }else{
       //console.log("new theme: " + gist_id);
@@ -419,6 +421,10 @@ const get_slides = (req, res, next) => {
       }else if (response.status == 403){
         gist = rate_limit_slides;
         res.status(403);
+      }else if (response.status == 401){
+        gist = rate_limit_slides;
+        res.status(401);
+        console.log("ERROR: GH_API_TOKEN expired or invalid");
       }else{
         gist = error_slides;
         res.status(404);

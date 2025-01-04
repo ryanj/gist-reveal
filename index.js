@@ -53,6 +53,7 @@ let config = cc({
 , DEBUG : Number(process.env.DEBUG) || 0
 , GIST_THEMES : process.env.GIST_THEMES || "true"
 , SANITIZE_INPUT : process.env.SANITIZE_INPUT || "false"
+, FILTER_REQUESTS : process.env.FILTER_REQUESTS || "true"
 , GH_API_TOKEN : process.env.GH_API_TOKEN
 , CLIENT_ID : process.env.CLIENT_ID || ""
 , CLIENT_SECRET : process.env.CLIENT_SECRET || ""
@@ -634,14 +635,23 @@ app.get("/robots.txt", (req,res,next) => {
 Disallow: /`;
   return res.send(robot_resp);
 });
-app.get("/:page\.php7", (req,res,next) => {
-  if(config.get('DEBUG') >= 2){console.log("404: "+req.params.page+".php7");}
-  return res.status(404).send("Not Found");
-});
-app.get("/:page\.php", (req,res,next) => {
-  if(config.get('DEBUG') >= 2){console.log("404: "+req.params.page+".php");}
-  return res.status(404).send("Not Found");
-});
+if(config.get("FILTER_REQUESTS") == "true"){
+  //reject requests for .env*
+  app.get(/^\/\.env.*/, (req,res,next) => {
+    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
+    return res.status(404).send("Not Found: "+req.url);
+  });
+  //reject requests for *.zip, *.sql
+  app.get(/.*\.(sql|zip)$/, (req,res,next) => {
+    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
+    return res.status(404).send("Not Found: "+req.url);
+  });
+  //reject requests for *.php.*
+  app.get(/.*\.(php|PhP).*/, (req,res,next) => {
+    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
+    return res.status(404).send("Not Found: "+req.url);
+  });
+}
 app.get("/favicon.ico", (req,res,next) => {
   return res.send(favicon);
 });

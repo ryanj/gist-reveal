@@ -635,23 +635,7 @@ app.get("/robots.txt", (req,res,next) => {
 Disallow: /`;
   return res.send(robot_resp);
 });
-if(config.get("FILTER_REQUESTS") == "true"){
-  //reject requests for .env*
-  app.get(/^\/\.env.*/, (req,res,next) => {
-    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
-    return res.status(404).send("Not Found: "+req.url);
-  });
-  //reject requests for *.zip, *.sql
-  app.get(/.*\.(sql|zip)$/, (req,res,next) => {
-    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
-    return res.status(404).send("Not Found: "+req.url);
-  });
-  //reject requests for *.php.*
-  app.get(/.*\.(php|PhP).*/, (req,res,next) => {
-    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
-    return res.status(404).send("Not Found: "+req.url);
-  });
-}
+
 app.get("/favicon.ico", (req,res,next) => {
   return res.send(favicon);
 });
@@ -679,6 +663,20 @@ app.get("/img/presented_by/:username", svgtemplate);
 // Bit.ly shortname integration
 app.get("/bitly/:short_name", get_bitlink);
 app.get("/bit\.ly/:short_name", get_bitlink);
+
+// Filter some bot requests
+if(config.get("FILTER_REQUESTS") == "true"){
+  const bot_filter = (req,res,next) => {
+    if(config.get('DEBUG') >= 2){console.log("404: "+req.url);}
+    return res.status(404).send("Not Found: "+req.url);
+  };
+  //reject requests for .env*
+  app.get(/^\/\.env.*/, bot_filter);
+  //reject requests for *.zip, *.sql
+  app.get(/.*\.(sql|zip)$/, bot_filter);
+  //reject requests for *.php*
+  app.get(/.*\.(php|PhP).*/, bot_filter);
+}
 
 // Gist templates:
 app.get("/:gist_id", get_slides);

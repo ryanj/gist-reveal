@@ -1,51 +1,58 @@
-
-registry = docker.io
+# default options:
 docker_cli = podman
+registry = docker.io
 user = ryanj
+image = gist-reveal
 tag = latest
-latest_img_id = $(shell $(docker_cli) images -q $(registry)/$(user)/gist-reveal:latest)
+arch = amd64
+SHELL=/bin/bash
 
 # make
 all: build
 
 # make build user=fkautz docker_cli=docker
 build:
-	$(docker_cli) build --arch=amd64 -t $(registry)/$(user)/gist-reveal:latest .
+	$(docker_cli) build --platform=linux/$(arch) -t $(registry)/$(user)/$(image):latest .
 
 # make tag tag=x.y.z
-tag:
+tag: build
 ifeq ($(tag), latest)
 	@echo error: tag required
 	@echo try: 'make tag tag=x.y.z'
-else ifneq ($(latest_img_id),)
-	$(docker_cli) tag $(latest_img_id) $(registry)/$(user)/gist-reveal:$(tag)
 else
-	@echo error: run 'make build' first
+	$(docker_cli) tag $$($(docker_cli) images -q $(registry)/$(user)/$(image):latest) $(registry)/$(user)/$(image):$(tag)
 endif
 
 # make publish tag=x.y.z
 push publish:
-	@echo publishing tag=$(tag) to $(registry)/$(user)/gist-reveal
-	$(docker_cli) push $(registry)/$(user)/gist-reveal:$(tag)
-	@echo published: $(registry)/$(user)/gist-reveal:$(tag)
+	@echo publishing tag=$(tag) to $(registry)/$(user)/$(image)
+	$(docker_cli) push $(registry)/$(user)/$(image):$(tag)
+	@echo published: $(registry)/$(user)/$(image):$(tag)
 
 # make run
 run:
-	$(docker_cli) run --rm -p 8080:8080 -e "DEBUG=1" $(registry)/$(user)/gist-reveal:$(tag)
-
-node_modules:
-	npm install
+	$(docker_cli) run --rm -p 8080:8080 -e "DEBUG=1" $(registry)/$(user)/$(image):$(tag)
 
 # make dev
 dev: node_modules
 	DEBUG=1 npm start
 
-# make clean
+# make clean tag=x.y.z
 clean:
-	rm -Rf node_modules css/theme/gists
+	rm -Rf node_modules css/theme/gists public.crt private.key
 ifneq ($(tag),latest)
-	$(docker_cli) rmi $(registry)/$(user)/gist-reveal:$(tag)
+	$(docker_cli) rmi $(registry)/$(user)/$(image):$(tag)
 endif
-ifneq ($(latest_img_id),)
-	$(docker_cli) rmi $(latest_img_id)
+ifneq (,$(shell $(docker_cli) images -q $(registry)/$(user)/$(image):latest))
+	$(docker_cli) rmi -f $$($(docker_cli) images -q $(registry)/$(user)/$(image):latest)
 endif
+
+node_modules:
+	npm install
+
+public.crt private.key:
+	openssl req -x509 -out public.crt -keyout private.key \
+	-newkey rsa:2048 -nodes -sha256 \
+	-subj '/CN=localhost' -extensions EXT -config <(printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+
+-include Makefile.local

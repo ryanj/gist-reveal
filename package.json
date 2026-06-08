@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "config-multipaas": "^0.2.2",
-    "express": "^4.22.2",
+    "express": "^5.2.1",
     "node-fetch": "^3.3.2",
     "reveal.js": "5.1.0",
     "reveal.js-copycode": "^1.2.0",
